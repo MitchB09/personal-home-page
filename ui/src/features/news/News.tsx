@@ -9,11 +9,8 @@ export const News = (): JSX.Element => {
   const [data, setData] = useState<string>("")
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    axios
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    void axios
       .get<string>(url)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
       .then(response => { setData(response.data) })
   }, [])
 
