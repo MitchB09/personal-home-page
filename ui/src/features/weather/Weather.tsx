@@ -19,10 +19,6 @@ const params: WeatherRequest = {
 export const Weather = (): JSX.Element => {
   const { data, isError, isLoading /*, isSuccess*/ } =
     useGetWeatherQuery(params)
-  console.dir(data)
-  console.dir(isError)
-
-  console.dir(isLoading)
 
   const [selectedDay, setSelectedDay] = useState<DailyWeather | undefined>()
   const containerRef = useRef<HTMLElement>(null)
@@ -48,9 +44,6 @@ export const Weather = (): JSX.Element => {
       <Backdrop
         sx={theme => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
         open={false}
-        onClick={() => {
-          console.dir("Backdrop onClose")
-        }}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

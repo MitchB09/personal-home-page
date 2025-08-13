@@ -3,6 +3,7 @@ import CssBaseline from "@mui/material/CssBaseline"
 
 import "./App.css"
 import { Weather } from "./features/weather/Weather"
+import { News } from "./features/news/News"
 
 const darkTheme = createTheme({
   palette: {
@@ -17,6 +18,9 @@ export const App = () => (
       <header className="App-header">
         <div role="weather">
           <Weather />
+        </div>
+        <div role="news">
+          <News />
         </div>
       </header>
     </div>

@@ -64,7 +64,6 @@ export const weatherApiSlice = createApi({
             dailyWeatherMap.set(date.toUTCString(), dailyWeather)
           }
          })
-         console.dir([...dailyWeatherMap.values()])
 
         return [...dailyWeatherMap.values()]
       },
