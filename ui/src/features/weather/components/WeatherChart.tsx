@@ -15,7 +15,7 @@ import {
 } from "@mui/x-charts";
 import { format } from 'date-fns';
 
-import { DailyWeather } from "../types";
+import type { DailyWeather } from "../types";
 
 
 export type WeatherChartProps = {
@@ -27,7 +27,7 @@ export const WeatherChart = (props: WeatherChartProps): JSX.Element => {
   const { selectedDay, data } = props;
 
   const id = useId();
-  const clipPathId = `${id}-clip-path`;
+  const clipPathId = `${id ?? ''}-clip-path`;
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   setTimeout(() => {
@@ -37,8 +37,8 @@ export const WeatherChart = (props: WeatherChartProps): JSX.Element => {
   return (
     <>
       <span>
-        <Typography variant="h5">{format(selectedDay?.time, "EEEE")}</Typography>
-        <Typography variant="subtitle2">{format(selectedDay?.time, "MMM d")}</Typography>
+        <Typography variant="h5">{format(selectedDay.time, "EEEE")}</Typography>
+        <Typography variant="subtitle2">{format(selectedDay.time, "MMM d")}</Typography>
       </span>
       <ChartContainer
         dataset={data?.flatMap(day => day.hourly)}
@@ -52,12 +52,12 @@ export const WeatherChart = (props: WeatherChartProps): JSX.Element => {
           }
         ]}
         yAxis={[
-          { dataKey: 'temperature', min: 0, valueFormatter: (value: number) => `${value}°` },
+          { dataKey: 'temperature', min: 0, valueFormatter: (value: number) => `${value.toString()}°` },
           { dataKey: 'rain', min: 0 }
         ]}
         series={[
-          { dataKey: 'temperature', type: 'line', valueFormatter: (value: number | null) => `${value}°C`, showMark: ({ index }) => index % 2 === 0, },
-          { dataKey: 'rain', type: 'line', valueFormatter: (value: number | null) => `${value}mm`, showMark: false }]}
+          { dataKey: 'temperature', type: 'line', valueFormatter: (value: number | null) => `${value?.toString() ?? '0'}°C`, showMark: ({ index }) => index % 2 === 0, },
+          { dataKey: 'rain', type: 'line', valueFormatter: (value: number | null) => `${value?.toString() ?? '0'}mm`, showMark: false }]}
       >
 
         <ChartsXAxis />
