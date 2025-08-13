@@ -1,6 +1,6 @@
 // Need to use the React-specific entry point to import `createApi`
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import { DailyWeather, HourlyWeather, WeatherRequest, WeatherResponse } from "./types";
+import type { DailyWeather, HourlyWeather, WeatherRequest, WeatherResponse } from "./types";
 import { format } from "date-fns";
 
 
@@ -16,7 +16,7 @@ export const weatherApiSlice = createApi({
     // for the argument type instead.
     getWeather: build.query<DailyWeather[], WeatherRequest>({
       query: (request: WeatherRequest) => {
-        let url = `?latitude=${request.latitude}&longitude=${request.longitude}&forecast_days=${request.forecastDays}`
+        let url = `?latitude=${request.latitude.toString()}&longitude=${request.longitude.toString()}&forecast_days=${request.forecastDays.toString()}`
 
         url += '&timezone=America%2FHalifax'
         if (request.hourly && request.hourly.length > 0) {
@@ -37,6 +37,7 @@ export const weatherApiSlice = createApi({
             time: new Date(response.daily.time[index] + 'T00:00'),
             sunrise: new Date(response.daily.sunrise[index]),
             sunset: new Date(response.daily.sunset[index]),
+            hourly: []
           } as DailyWeather
           dailyWeatherMap.set(daily.time.toUTCString(), daily);
          });
@@ -59,9 +60,6 @@ export const weatherApiSlice = createApi({
             if (!dailyWeather) {
               throw new Error('No Daily Entry found')
             }
-            if (!dailyWeather.hourly) {
-              dailyWeather.hourly = []
-            }
             dailyWeather.hourly.push(hourly)
             dailyWeatherMap.set(date.toUTCString(), dailyWeather)
           }
@@ -71,7 +69,7 @@ export const weatherApiSlice = createApi({
       },
       // `providesTags` determines which 'tag' is attached to the
       // cached data returned by the query.
-      providesTags: (_result, _error) => [{ type: "Weather" }],
+      providesTags: () => [{ type: "Weather" }],
     }),
   }),
 })

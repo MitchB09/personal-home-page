@@ -27,11 +27,13 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: Build
+    - name: Test & Build
       run: |
         cd ui
         npm install
-        npm run build:prod
+        npm run lint
+        npm run test
+        npm run build
         cd ../
     
     - name: Configure AWS credentials
@@ -45,7 +47,7 @@ jobs:
       run: echo "S3_BUCKET=$(aws cloudformation describe-stacks --stack-name ${{ vars.STACK_NAME }} --output json | jq -r '.Stacks[].Outputs[] | select(.OutputKey == "S3Bucket") | .OutputValue')" >> $GITHUB_ENV
 
     - name: Sync build output with bucket
-      run: aws s3 sync ui/build/ s3://$S3_BUCKET
+      run: aws s3 sync ui/dist/ s3://$S3_BUCKET
 
     - name: Set AWS CloudFront Distribution from Stack Output
       run: echo "CLOUDFRONT_DISTRIBUTION=$(aws cloudformation describe-stacks --stack-name ${{ vars.STACK_NAME }} --output json | jq -r '.Stacks[].Outputs[] | select(.OutputKey == "CloudFrontDistribution") | .OutputValue')" >> $GITHUB_ENV
