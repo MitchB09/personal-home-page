@@ -1,21 +1,26 @@
 import type { JSX } from "react"
-import { useEffect, useState } from "react"
+import { Paper } from "@mui/material"
+import style from "./News.module.css"
+import type { RssFeed } from "./types"
+import { Feed } from "./components/Feed"
 
-import axios from "axios"
-
-const url = "https://www.cbc.ca/webfeed/rss/rss-canada-newbrunswick"
+const subscriptions = [
+  {
+    title: "CBC New Brunswick",
+    url: "https://cors.eu.org/https://www.cbc.ca/webfeed/rss/rss-canada-newbrunswick",
+    items: [],
+  },
+  {
+    title: "New YCombinator",
+    url: "https://cors.eu.org/https://news.ycombinator.com/rss",
+    items: [],
+  },
+] as RssFeed[]
 
 export const News = (): JSX.Element => {
-  const [data, setData] = useState<string>("")
-
-  useEffect(() => {
-    void axios
-      .get<string>(url)
-      .then(response => { setData(response.data) })
-  }, [])
-
-  const xmlDoc = new DOMParser().parseFromString(data, "text/xml")
-  console.dir(xmlDoc);
-
-  return <>News</>
+  return (
+    <Paper className={style.container}>
+      {subscriptions.map((subscription, index) => <Feed key={index} rssFeed={subscription} />)}
+    </Paper>
+  )
 }
