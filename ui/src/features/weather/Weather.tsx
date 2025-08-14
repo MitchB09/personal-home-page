@@ -1,7 +1,13 @@
 import type { JSX } from "react"
 import { useRef, useState } from "react"
 
-import { Backdrop, Box, CircularProgress, Grow, Stack } from "@mui/material"
+import {
+  Backdrop,
+  Box,
+  CircularProgress,
+  Collapse,
+  Stack,
+} from "@mui/material"
 
 import { WeatherCard } from "./components/WeatherCard"
 import { WeatherChart } from "./components/WeatherChart"
@@ -47,27 +53,34 @@ export const Weather = (): JSX.Element => {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Stack direction="row" spacing={2}>
-        {data?.map(day => (
-          <WeatherCard
-            key={day.time.toUTCString()}
-            dailyWeather={day}
-            selectedDay={selectedDay}
-            setSelectedDay={setSelectedDay}
-          />
-        ))}
-      </Stack>
-      {selectedDay && (
-        <Grow
-          in={!!selectedDay}
-          style={{ transformOrigin: "0 0 0" }}
-          timeout={1000}
-        >
-          <Box style={{ height: "300px", margin: "1em 0em" }}>
+      <Collapse
+        in={!selectedDay}
+        style={{ transformOrigin: "0 0 0" }}
+        collapsedSize={"5em"}
+        timeout={1000}
+      >
+        <Stack direction="row" spacing={2}>
+          {data?.map(day => (
+            <WeatherCard
+              key={day.time.toUTCString()}
+              dailyWeather={day}
+              selectedDay={selectedDay}
+              setSelectedDay={setSelectedDay}
+            />
+          ))}
+        </Stack>
+      </Collapse>
+      <Collapse
+        in={!!selectedDay}
+        style={{ transformOrigin: "0 0 0" }}
+        timeout={1000}
+      >
+        <Box style={{ height: "300px", margin: "1em 0em" }}>
+          {selectedDay && (
             <WeatherChart selectedDay={selectedDay} data={data} />
-          </Box>
-        </Grow>
-      )}
+          )}
+        </Box>
+      </Collapse>
     </Box>
   )
 }

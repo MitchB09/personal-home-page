@@ -15,7 +15,64 @@ Conditions:
     - !Ref Stage
     - prod
 
+Globals:
+  Function:
+    Timeout: 5
+    Handler: index.handler
+    Runtime: nodejs22.x
+    Environment:
+      Variables:
+        BOARDS_TABLE: !Ref RssTable
+
 Resources:
+
+  RssTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: 'url'
+          AttributeType: 'S'
+        - AttributeName: 'id'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'url'
+          KeyType: 'HASH'
+        - AttributeName: 'id'
+          KeyType: 'RANGE'
+      BillingMode: PAY_PER_REQUEST
+
+  ScrapeRssFeeds:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/scraper
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:Query
+              - dynamodb:PutItem
+            Resource: 
+              - !GetAtt RssTable.Arn
+      Events:
+        ComplexScheduleEvent:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 day)
+            FlexibleTimeWindow:
+              Mode: FLEXIBLE
+              MaximumWindowInMinutes: 5
+            StartDate: '2025-08-15T12:00:00.000Z'
+            EndDate: '2025-08-16T12:00:00.000Z'
+            ScheduleExpressionTimezone: UTC
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true # Optional: minify the output JavaScript
+        Target: es2020 # Optional: specify target JavaScript version
+  
+  
   S3Bucket:
     Type: AWS::S3::Bucket
   S3BucketPolicy:
@@ -31,7 +88,6 @@ Resources:
               - !Sub "arn:aws:s3:::${S3Bucket}/*"
             Principal:
               AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}"
-
 
   CloudFrontOriginAccessIdentity:
     Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
@@ -77,6 +133,9 @@ Outputs:
   S3Bucket: 
     Description: S3 Bucket Name
     Value: !Ref S3Bucket
+  RssTable:
+    Description: RssTable Name
+    Value: !Ref RssTable
   CloudFrontDisribution:
     Description: CloudFront Distibution Id
     Value: !Ref CloudFrontDistribution

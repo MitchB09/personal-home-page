@@ -98,10 +98,14 @@ export const WeatherCard = (props: WeatherCardProps): JSX.Element => {
             <Typography variant="caption" component="div">
               {format(dailyWeather.time, "MMM d")}
             </Typography>
-            <Box style={{ height: "2em", width: "2em" }}>
-              <SunnyIcon />
-            </Box>
-            {mapDetails(dailyWeather)}
+            {!selectedDay && (
+              <>
+                <Box style={{ height: "2em", width: "2em" }}>
+                  <SunnyIcon />
+                </Box>
+                {mapDetails(dailyWeather)}
+              </>
+            )}
           </Stack>
         </CardContent>
       </CardActionArea>
