@@ -5,35 +5,13 @@ import axios from "axios";
 import { readFileSync } from "fs";
 
 import { handler } from "../index";
+import { mockContext } from "../../mocks";
 
 // Mock jest and set the type
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const testTableName = "TEST_RSS_TABLE_NAME";
-
-const mockContext = {
-  callbackWaitsForEmptyEventLoop: false,
-  functionName: "",
-  functionVersion: "",
-  invokedFunctionArn: "",
-  memoryLimitInMB: "",
-  awsRequestId: "",
-  logGroupName: "",
-  logStreamName: "",
-  getRemainingTimeInMillis: function (): number {
-    throw new Error("Function not implemented.");
-  },
-  done: function (error?: Error, result?: any): void {
-    throw new Error("Function not implemented.");
-  },
-  fail: function (error: Error | string): void {
-    throw new Error("Function not implemented.");
-  },
-  succeed: function (messageOrObject: any): void {
-    throw new Error("Function not implemented.");
-  },
-};
 
 describe("Index.js", () => {
   // Create a mock for S3 at the beginning of your describe block.

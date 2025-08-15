@@ -2,7 +2,7 @@ import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 
 import { handler } from "../index";
-import { mockContext, mockEvent, mockGetResult } from "./mocks";
+import { mockContext, mockEvent, mockGetResult } from "../../mocks";
 
 const testTableName = "TEST_RSS_TABLE_NAME";
 
