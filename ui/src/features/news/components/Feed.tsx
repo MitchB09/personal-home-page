@@ -12,7 +12,7 @@ export const Feed = (props: FeedProps): JSX.Element => {
   const { id } = props
 
   const { data /* isError, isLoading isSuccess */ } = useGetRssFeedQuery(id)
-  const feed = data?.rssData.channel
+  const feed = data ? data.rssData.channel: undefined;
 
   return (
     <Box style={{ minHeight: "15em", minWidth: "30em" }}>
