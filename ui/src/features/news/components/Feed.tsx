@@ -1,31 +1,18 @@
 import type { JSX } from "react"
-import { useEffect, useState } from "react"
 
-import axios from "axios"
 import { Box, Link, List, ListItem, Skeleton, Typography } from "@mui/material"
-import type { Item, Payload, RssFeed } from "../types"
+import type { Item } from "../types"
+import { useGetRssFeedQuery } from "../rssApiSlice"
 
 export type FeedProps = {
-  url: string
+  id: string
 }
 
 export const Feed = (props: FeedProps): JSX.Element => {
-  const { url } = props
+  const { id } = props
 
-  const [feed, setFeed] = useState<RssFeed | undefined>()
-  useEffect(() => {
-    axios
-      .get<Payload>(url)
-      .then(response => {
-        const { data } = response
-        const { rssData } = data
-        const { channel } = rssData
-        setFeed(channel)
-      })
-      .catch((error: unknown) => {
-        console.dir(error)
-      })
-  }, [url])
+  const { data /* isError, isLoading isSuccess */ } = useGetRssFeedQuery(id)
+  const feed = data?.rssData.channel
 
   return (
     <Box style={{ minHeight: "15em", minWidth: "30em" }}>
