@@ -2,10 +2,11 @@ import type { Action, ThunkAction } from "@reduxjs/toolkit"
 import { combineSlices, configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
 import { weatherApiSlice } from "../features/weather/weatherApiSlice"
+import { rssApiSlice } from "../features/news/rssApiSlice"
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices(weatherApiSlice)
+const rootReducer = combineSlices(weatherApiSlice, rssApiSlice)
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>
 
@@ -18,8 +19,8 @@ export const makeStore = (preloadedState?: Partial<RootState>) => {
     // and other useful features of `rtk-query`.
     middleware: getDefaultMiddleware => {
       return getDefaultMiddleware({
-      serializableCheck: false,
-    }).concat(weatherApiSlice.middleware)
+        serializableCheck: false,
+      }).concat(weatherApiSlice.middleware, rssApiSlice.middleware)
     },
     preloadedState,
   })
