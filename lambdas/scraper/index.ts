@@ -7,26 +7,40 @@ import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
 
 const parser = new XMLParser();
+const entityType = "RSS";
 
 export const handler = async (_: any, context: Context) => {
   const subscriptions = [
-    "https://news.ycombinator.com/rss",
-    "https://www.cbc.ca/webfeed/rss/rss-canada-newbrunswick",
+    { id: "1", rssUrl: "https://news.ycombinator.com/rss" },
+    {
+      id: "2",
+      rssUrl: "https://www.cbc.ca/webfeed/rss/rss-canada-newbrunswick",
+    },
   ];
 
-  //const client = new DynamoDBClient({});
-  //const docClient = DynamoDBDocumentClient.from(client);
+  const dynamodb = new DynamoDBClient({});
+  const ddb = DynamoDBDocumentClient.from(dynamodb);
+  const rssTable = process.env.RSS_TABLE;
 
   const results = subscriptions.map((subscription) => {
-    return axios
-      .get(subscription)
-      .then((response) => {
-        const data = parser.parse(response.data);
-        return data['rss'];
-        //console.dir(jObj);
+    return axios.get(subscription.rssUrl).then(async (response) => {
+      console.dir("Fetching: " + subscription.rssUrl);
+      const data = parser.parse(response.data);
 
-        //console.dir(jObj["rss"]["channel"]);
-      });
+      var params = {
+        TableName: rssTable,
+        Item: {
+          entityType: entityType,
+          id: subscription.id,
+          rssUrl: subscription.rssUrl,
+          rssData: data["rss"],
+          lastUpdated: Date.now(),
+        },
+      };
+
+      await ddb.send(new PutCommand(params));
+      return data["rss"];
+    });
   });
 
   return await Promise.all(results)

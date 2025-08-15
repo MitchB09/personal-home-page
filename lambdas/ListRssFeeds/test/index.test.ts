@@ -77,10 +77,10 @@ describe("Index.js", () => {
     );
     expect(
       ddbMock.call(0).args[0]["clientCommand"]["input"]["Item"]["id"]
-    ).toBe("1");
+    ).toBe(1);
 
     expect(
       ddbMock.call(1).args[0]["clientCommand"]["input"]["Item"]["id"]
-    ).toBe("2");
+    ).toBe(2);
   });
 });

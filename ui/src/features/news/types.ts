@@ -7,12 +7,24 @@ export type Item = {
 }
 
 export type RssFeed = {
-  //document: Document
-  title: string
-  url: string
-  items?: Item[]
+  title: string,
+  link: string,
+  description	: string,
+  item: Item[]
 }
 
-export type NewsProps = {
-  url: string
+export type RssData = {
+  channel: RssFeed,
+}
+
+export type Payload = {
+  id: number,
+  rssUrl: string,
+  lastUpdated: number,
+  rssData: RssData,
+}
+
+export type RssSubscription = {
+  title: string,
+  url: string,
 }

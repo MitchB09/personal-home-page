@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: home-page
 
@@ -9,9 +9,9 @@ Parameters:
   Stage:
     Type: String
     Description: The Stage where the application is running in, e.g., dev, prod.
-  
+
 Conditions:
-  IsProduction: !Equals 
+  IsProduction: !Equals
     - !Ref Stage
     - prod
 
@@ -22,23 +22,22 @@ Globals:
     Runtime: nodejs22.x
     Environment:
       Variables:
-        BOARDS_TABLE: !Ref RssTable
+        RSS_TABLE: !Ref RssTable
 
 Resources:
-
   RssTable:
-    Type: 'AWS::DynamoDB::Table'
+    Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
-        - AttributeName: 'url'
-          AttributeType: 'S'
-        - AttributeName: 'id'
-          AttributeType: 'S'
+        - AttributeName: "entityType"
+          AttributeType: "S"
+        - AttributeName: "id"
+          AttributeType: "S"
       KeySchema:
-        - AttributeName: 'url'
-          KeyType: 'HASH'
-        - AttributeName: 'id'
-          KeyType: 'RANGE'
+        - AttributeName: "entityType"
+          KeyType: "HASH"
+        - AttributeName: "id"
+          KeyType: "RANGE"
       BillingMode: PAY_PER_REQUEST
 
   ScrapeRssFeeds:
@@ -46,15 +45,15 @@ Resources:
     Properties:
       CodeUri: lambdas/scraper
       Policies:
-      - AWSLambdaBasicExecutionRole
-      - Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-              - dynamodb:Query
-              - dynamodb:PutItem
-            Resource: 
-              - !GetAtt RssTable.Arn
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:PutItem
+              Resource:
+                - !GetAtt RssTable.Arn
       Events:
         ComplexScheduleEvent:
           Type: ScheduleV2
@@ -63,16 +62,74 @@ Resources:
             FlexibleTimeWindow:
               Mode: FLEXIBLE
               MaximumWindowInMinutes: 5
-            StartDate: '2025-08-15T12:00:00.000Z'
-            EndDate: '2025-08-16T12:00:00.000Z'
+            StartDate: "2025-08-15T12:00:00.000Z"
+            EndDate: "2025-08-16T12:00:00.000Z"
             ScheduleExpressionTimezone: UTC
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true # Optional: minify the output JavaScript
         Target: es2020 # Optional: specify target JavaScript version
-  
-  
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      
+  ApiListRssFeeds:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/ListRssFeeds
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+              Resource:
+                - !GetAtt RssTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
+  ApiGetRssFeeds:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/GetRssFeeds
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+              Resource:
+                - !GetAtt RssTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /{id}
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true # Optional: minify the output JavaScript
+        Target: es2020 # Optional: specify target JavaScript version
+
   S3Bucket:
     Type: AWS::S3::Bucket
   S3BucketPolicy:
@@ -80,36 +137,36 @@ Resources:
     Properties:
       Bucket: !Ref S3Bucket
       PolicyDocument:
-      # Restricting access to cloudfront only.
+        # Restricting access to cloudfront only.
         Statement:
           - Effect: Allow
-            Action: 's3:GetObject'
+            Action: "s3:GetObject"
             Resource:
               - !Sub "arn:aws:s3:::${S3Bucket}/*"
             Principal:
               AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}"
 
   CloudFrontOriginAccessIdentity:
-    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity"
     Properties:
       CloudFrontOriginAccessIdentityConfig:
-        Comment: 'Serverless website OA'
+        Comment: "Serverless website OA"
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        Aliases: 
-          - !If 
-            - IsProduction 
+        Aliases:
+          - !If
+            - IsProduction
             - !Sub "home.bilensky.ca"
             - !Ref "AWS::NoValue"
         Origins:
-        - Id: s3-website
-          DomainName: !GetAtt S3Bucket.DomainName
-          S3OriginConfig:
-            # Restricting Bucket access through an origin access identity
-            OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+          - Id: s3-website
+            DomainName: !GetAtt S3Bucket.DomainName
+            S3OriginConfig:
+              # Restricting Bucket access through an origin access identity
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
         Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
@@ -121,16 +178,15 @@ Resources:
           ForwardedValues:
             QueryString: false
           TargetOriginId: s3-website
-          ViewerProtocolPolicy : redirect-to-https
+          ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_100
         ViewerCertificate:
-          SslSupportMethod: 'sni-only'
+          SslSupportMethod: "sni-only"
           AcmCertificateArn: !Sub arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/${CertificateId}
-          MinimumProtocolVersion: 'TLSv1.2_2019'
-
+          MinimumProtocolVersion: "TLSv1.2_2019"
 
 Outputs:
-  S3Bucket: 
+  S3Bucket:
     Description: S3 Bucket Name
     Value: !Ref S3Bucket
   RssTable:

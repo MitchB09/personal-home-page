@@ -2,73 +2,39 @@ import type { JSX } from "react"
 import { useEffect, useState } from "react"
 
 import axios from "axios"
-import {
-  Box,
-  Link,
-  List,
-  ListItem,
-  Skeleton,
-  Typography,
-} from "@mui/material"
-import type { Item, RssFeed } from "../types"
+import { Box, Link, List, ListItem, Skeleton, Typography } from "@mui/material"
+import type { Item, Payload, RssFeed } from "../types"
 
 export type FeedProps = {
-  rssFeed: RssFeed
+  url: string
 }
 
 export const Feed = (props: FeedProps): JSX.Element => {
-  const { rssFeed } = props
+  const { url } = props
 
-  const [feed, setFeed] = useState<RssFeed>({ ...rssFeed })
+  const [feed, setFeed] = useState<RssFeed | undefined>()
   useEffect(() => {
-    void axios
-      .get<string>(rssFeed.url)
+    axios
+      .get<Payload>(url)
       .then(response => {
-        const parser = new DOMParser()
-        const parsed = parser.parseFromString(response.data, "text/xml")
-        const rssChannel = parsed.children[0].children[0]
-        const items = [] as Item[]
-
-        for (const element of rssChannel.children) {
-          if (element.tagName === "item") {
-            items.push({
-              guid: getTextByTag(element, "title"),
-              title: getTextByTag(element, "title"),
-              link: getTextByTag(element, "link"),
-              description: getTextByTag(element, "description"),
-              pubDate: getTextByTag(element, "pubDate"),
-            })
-          }
-        }
-        setTimeout(() => {
-          setFeed({
-            ...rssFeed,
-            items: items,
-          })
-        }, 4000)
+        const { data } = response
+        const { rssData } = data
+        const { channel } = rssData
+        setFeed(channel)
       })
       .catch((error: unknown) => {
         console.dir(error)
       })
-  }, [rssFeed])
-
-  const getTextByTag = (element: Element, tagName: string): string => {
-    for (const child of element.children) {
-      if (child.tagName === tagName) {
-        return child.textContent ?? "No text content"
-      }
-    }
-    return "not found!!"
-  }
+  }, [url])
 
   return (
     <Box style={{ minHeight: "15em", minWidth: "30em" }}>
-      <Typography variant="subtitle2">{feed.title}</Typography>
-      {feed.items?.length ? (
+      <Typography variant="subtitle2">{feed?.title}</Typography>
+      {feed?.item.length ? (
         <List>
-          {feed.items
+          {feed.item
             .filter((_, index) => index < 5)
-            .map(item => (
+            .map((item: Item) => (
               <Link
                 key={item.guid}
                 href={item.link}
