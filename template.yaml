@@ -168,6 +168,33 @@ Resources:
         Minify: true
         Target: es2020
 
+  ApiDeleteRssFeed:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/rss/DeleteRssFeed
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:DeleteItem
+              Resource:
+                - !GetAtt RssTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /rss/feeds/{id}
+            Method: delete
+            RestApiId:
+              Ref: ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
   S3Bucket:
     Type: AWS::S3::Bucket
   S3BucketPolicy:
