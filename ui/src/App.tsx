@@ -18,10 +18,20 @@ export const App = () => (
     <div className="App">
       <header className="App-header">
         <Grid container direction="row">
-          <Grid component="div" role="weather" className="tile">
+          <Grid
+            sx={{ width: "40vw", height: "30vh" }}
+            component="div"
+            role="weather"
+            className="tile"
+          >
             <Weather />
           </Grid>
-          <Grid component="div" role="news" className="tile">
+          <Grid
+            sx={{ width: "40vw", height: "55vh" }}
+            component="div"
+            role="news"
+            className="tile"
+          >
             <News />
           </Grid>
         </Grid>

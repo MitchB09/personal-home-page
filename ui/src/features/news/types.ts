@@ -18,13 +18,19 @@ export type RssData = {
 }
 
 export type Payload = {
-  id: number,
+  id: string,
+  title: string,
   rssUrl: string,
-  lastUpdated: number,
-  rssData: RssData,
+  lastUpdated?: number,
+  rssData?: RssData,
 }
 
 export type RssSubscription = {
   title: string,
   url: string,
+}
+
+export type AddFeedForm = {
+  name: string
+  url: string
 }

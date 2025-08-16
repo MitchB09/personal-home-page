@@ -43,7 +43,7 @@ Resources:
   ScrapeRssFeeds:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambdas/scraper
+      CodeUri: lambdas/rss/scraper
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -58,12 +58,13 @@ Resources:
         ComplexScheduleEvent:
           Type: ScheduleV2
           Properties:
+            Name: !Sub "ScrapeRssFeeds-${Stage}-Schedule"
             ScheduleExpression: rate(1 day)
             FlexibleTimeWindow:
               Mode: FLEXIBLE
               MaximumWindowInMinutes: 5
-            StartDate: "2025-08-15T12:00:00.000Z"
-            EndDate: "2025-08-16T12:00:00.000Z"
+            StartDate: "2025-08-20T12:00:00.000Z"
+            EndDate: "2025-08-21T12:00:00.000Z"
             ScheduleExpressionTimezone: UTC
     Metadata:
       BuildMethod: esbuild
@@ -75,11 +76,20 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Stage
-      
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
+        AllowMethods: "'GET,POST,OPTIONS,PUT,DELETE'"
+        MaxAge: "'600'"
+      Domain:
+        DomainName: !Sub "home-api-${Stage}.bilensky.ca"
+        CertificateArn: !Sub arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/${CertificateId}
+        SecurityPolicy: TLS_1_2
+
   ApiListRssFeeds:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambdas/ListRssFeeds
+      CodeUri: lambdas/rss/ListRssFeeds
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
@@ -93,7 +103,7 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /
+            Path: /rss
             Method: get
             RestApiId:
               Ref: ApiGatewayApi
@@ -106,21 +116,21 @@ Resources:
   ApiGetRssFeeds:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambdas/GetRssFeeds
+      CodeUri: lambdas/rss/GetRssFeeds
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action:
-                - dynamodb:GetItem
+                - dynamodb:BatchGetItem
               Resource:
                 - !GetAtt RssTable.Arn
       Events:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /{id}
+            Path: /rss/feeds
             Method: get
             RestApiId:
               Ref: ApiGatewayApi
@@ -129,6 +139,34 @@ Resources:
       BuildProperties:
         Minify: true # Optional: minify the output JavaScript
         Target: es2020 # Optional: specify target JavaScript version
+
+  ApiPostRssFeed:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/rss/PostRssFeed
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:PutItem
+              Resource:
+                - !GetAtt RssTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /rss
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
 
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -198,3 +236,6 @@ Outputs:
   CloudFrontDomain:
     Description: CloudFront Domain Name
     Value: !GetAtt CloudFrontDistribution.DomainName
+  ApiGatewayUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://home-api-${Stage}.bilensky.ca/
