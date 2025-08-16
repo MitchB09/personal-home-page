@@ -1,10 +1,12 @@
 import { useState, type JSX } from "react"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import { Box, Grid, IconButton, Paper, Tab, Tabs } from "@mui/material"
+import SettingsIcon from "@mui/icons-material/Settings"
+import { Box, Divider, Grid, IconButton, Paper, Tab, Tabs } from "@mui/material"
 import style from "./News.module.css"
 import { Feed } from "./components/Feed"
 import { useGetRssSubsriptionsQuery } from "./rssApiSlice"
 import { AddFeed } from "./components/AddFeed"
+import { ManageFeeds } from "./components/ManageFeeds"
 
 export const News = (): JSX.Element => {
   const { data /* isError, isLoading isSuccess */ } =
@@ -29,7 +31,7 @@ export const News = (): JSX.Element => {
           justifyContent={"space-between"}
           alignItems={"center"}
         >
-          <Grid size={11}>
+          <Grid size={10}>
             <Tabs
               value={selected}
               onChange={handleChange}
@@ -49,6 +51,9 @@ export const News = (): JSX.Element => {
             </Tabs>
           </Grid>
           <Grid>
+            <Divider orientation="vertical" />
+          </Grid>
+          <Grid>
             <IconButton
               onClick={() => {
                 setSelected("add")
@@ -56,14 +61,12 @@ export const News = (): JSX.Element => {
             >
               <AddCircleOutlineIcon />
             </IconButton>
-          </Grid>
-          <Grid>
             <IconButton
               onClick={() => {
                 setSelected("manage")
               }}
             >
-              <AddCircleOutlineIcon />
+              <SettingsIcon />
             </IconButton>
           </Grid>
         </Grid>
@@ -80,8 +83,12 @@ export const News = (): JSX.Element => {
       <Box key={"add"} className={style.container} hidden={selected !== "add"}>
         <AddFeed />
       </Box>
-      <Box key={"manage"} className={style.container} hidden={selected !== "manage"}>
-        <AddFeed />
+      <Box
+        key={"manage"}
+        className={style.container}
+        hidden={selected !== "manage"}
+      >
+        <ManageFeeds feeds={data} />
       </Box>
     </Paper>
   )

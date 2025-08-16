@@ -1,0 +1,28 @@
+{
+  "name": "post-rss-feed",
+  "version": "0.0.1",
+  "description": "Pull data from feeds",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "mitch.bilensky",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.864.0",
+    "@aws-sdk/lib-dynamodb": "^3.864.0",
+    "axios": "^1.11.0",
+    "fast-xml-parser": "^5.2.5",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.152",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "jest": "^30.0.5",
+    "ts-jest": "^29.4.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}

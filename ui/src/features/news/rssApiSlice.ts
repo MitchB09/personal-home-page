@@ -12,16 +12,20 @@ export const rssApiSlice = createApi({
   tagTypes: ["RSS", "Subscriptions"],
   endpoints: build => ({
     getRssSubsriptions: build.query<Payload[], string>({
-      query: (id) => "/",
-      providesTags: ['Subscriptions'], // associate the result of this mutation with the "users" tag
+      query: id => "/",
     }),
     createRssSubscription: build.mutation<Payload, AddFeedForm>({
-      query: (body) => ({
-        url: '/',
-        method: 'POST',
+      query: body => ({
+        url: "/",
+        method: "POST",
         body,
       }),
-      invalidatesTags: ['Subscriptions']
+    }),
+    deleteRssSubscription: build.mutation<undefined, string>({
+      query: id => ({
+        url: "/feeds/" + id,
+        method: "DELETE",
+      }),
     }),
     getRssFeeds: build.query<Payload[], string[]>({
       query: (ids: string[]) => {
@@ -31,4 +35,9 @@ export const rssApiSlice = createApi({
   }),
 })
 
-export const { useGetRssSubsriptionsQuery, useGetRssFeedsQuery, useCreateRssSubscriptionMutation } = rssApiSlice
+export const {
+  useGetRssSubsriptionsQuery,
+  useGetRssFeedsQuery,
+  useCreateRssSubscriptionMutation,
+  useDeleteRssSubscriptionMutation,
+} = rssApiSlice
