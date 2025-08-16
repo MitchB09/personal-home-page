@@ -2,7 +2,7 @@ import type { JSX } from "react"
 
 import { Box, Link, List, ListItem, Skeleton, Typography } from "@mui/material"
 import type { Item } from "../types"
-import { useGetRssFeedQuery } from "../rssApiSlice"
+import { useGetRssFeedsQuery } from "../rssApiSlice"
 
 export type FeedProps = {
   id: string
@@ -11,8 +11,8 @@ export type FeedProps = {
 export const Feed = (props: FeedProps): JSX.Element => {
   const { id } = props
 
-  const { data /* isError, isLoading isSuccess */ } = useGetRssFeedQuery(id)
-  const feed = data ? data.rssData.channel: undefined;
+  const { data /* isError, isLoading isSuccess */ } = useGetRssFeedsQuery([id])
+  const feed = data ? data[0].rssData?.channel: undefined;
 
   return (
     <Box style={{ minHeight: "15em", minWidth: "30em" }}>

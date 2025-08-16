@@ -1,11 +1,16 @@
-import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 import axios from "axios";
 import { readFileSync } from "fs";
 
-import { handler } from "../index";
-import { mockContext } from "../../mocks";
+import { handler } from "./index";
+import {
+  mockCbcResult,
+  mockContext,
+  mockListResult,
+  mockYCombinatorResult,
+} from "../../mocks/mocks";
 
 // Mock jest and set the type
 jest.mock("axios");
@@ -20,10 +25,12 @@ describe("Index.js", () => {
   mockedAxios.get.mockImplementation((url) => {
     switch (url) {
       case "https://news.ycombinator.com/rss":
-        return Promise.resolve({ data: readFileSync("test/hackerNews.rss") });
+        return Promise.resolve({
+          data: readFileSync("../../mocks/hackerNews.rss"),
+        });
       case "https://www.cbc.ca/webfeed/rss/rss-canada-newbrunswick":
         return Promise.resolve({
-          data: readFileSync("test/canada-newbrunswick.rss"),
+          data: readFileSync("../../mocks/canada-newbrunswick.rss"),
         });
       default:
         return Promise.reject(new Error("Unknown URL"));
@@ -39,6 +46,10 @@ describe("Index.js", () => {
   });
 
   it("check response", async () => {
+    ddbMock.on(QueryCommand).resolves({
+      Items: mockListResult,
+    });
+
     ddbMock.on(PutCommand).resolves({});
 
     const response = await handler(undefined, mockContext);
@@ -49,16 +60,16 @@ describe("Index.js", () => {
     expect(response[0].channel.title).toBe("Hacker News");
     expect(response[1].channel.title).toBe("CBC | New Brunswick News");
 
-    expect(ddbMock.calls().length).toBe(2);
-    expect(ddbMock.call(0).args[0]["clientCommand"]["input"]["TableName"]).toBe(
+    expect(ddbMock.calls().length).toBe(3);
+    expect(ddbMock.call(1).args[0]["clientCommand"]["input"]["TableName"]).toBe(
       testTableName
     );
     expect(
-      ddbMock.call(0).args[0]["clientCommand"]["input"]["Item"]["id"]
-    ).toBe(1);
+      ddbMock.call(1).args[0]["clientCommand"]["input"]["Item"]["id"]
+    ).toBe("1");
 
     expect(
-      ddbMock.call(1).args[0]["clientCommand"]["input"]["Item"]["id"]
-    ).toBe(2);
+      ddbMock.call(2).args[0]["clientCommand"]["input"]["Item"]["id"]
+    ).toBe("2");
   });
 });

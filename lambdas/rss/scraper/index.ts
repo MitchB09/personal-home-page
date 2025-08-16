@@ -1,6 +1,10 @@
 //
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 import { Context } from "aws-lambda";
 import axios from "axios";
@@ -9,22 +13,35 @@ import { XMLParser } from "fast-xml-parser";
 const parser = new XMLParser();
 const entityType = "RSS";
 
-export const handler = async (_: any, context: Context) => {
-  const subscriptions = [
-    { id: "1", rssUrl: "https://news.ycombinator.com/rss" },
-    {
-      id: "2",
-      rssUrl: "https://www.cbc.ca/webfeed/rss/rss-canada-newbrunswick",
-    },
-  ];
+type Subscription = {
+  id: string;
+  rssUrl: string;
+};
 
+export const handler = async (_: any, context: Context) => {
   const dynamodb = new DynamoDBClient({});
   const ddb = DynamoDBDocumentClient.from(dynamodb);
   const rssTable = process.env.RSS_TABLE;
 
-  const results = subscriptions.map((subscription) => {
+  var params = {
+    ExpressionAttributeValues: {
+      ":entityType": entityType,
+    },
+    KeyConditionExpression: "entityType = :entityType",
+    ProjectionExpression: "id, rssUrl, title, lastUpdated",
+    TableName: rssTable,
+  };
+
+  const { Items } = await ddb.send(new QueryCommand(params));
+  if (!Items) {
+    return;
+  }
+
+  const results = Items.map((result) => {
+    const subscription = result as Subscription;
+    console.dir("Fetching: " + subscription.rssUrl);
+
     return axios.get(subscription.rssUrl).then(async (response) => {
-      console.dir("Fetching: " + subscription.rssUrl);
       const data = parser.parse(response.data);
 
       var params = {
@@ -32,6 +49,7 @@ export const handler = async (_: any, context: Context) => {
         Item: {
           entityType: entityType,
           id: subscription.id,
+          title: data["rss"]["channel"]["title"],
           rssUrl: subscription.rssUrl,
           rssData: data["rss"],
           lastUpdated: Date.now(),

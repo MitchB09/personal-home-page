@@ -7,7 +7,6 @@ import { Context } from "aws-lambda";
 const entityType = 'RSS';
 
 export const handler = async (event: any, context: Context) => {
-  console.dir(event);
   const dynamodb = new DynamoDBClient({});
   const ddb = DynamoDBDocumentClient.from(dynamodb);
   const rssTable = process.env.RSS_TABLE;
@@ -17,7 +16,7 @@ export const handler = async (event: any, context: Context) => {
       ":entityType": entityType,
     },
     KeyConditionExpression: "entityType = :entityType",
-    ProjectionExpression: "id, rssUrl, rssData, lastUpdated",
+    ProjectionExpression: "id, rssUrl, title, lastUpdated",
     TableName: rssTable,
   };
 

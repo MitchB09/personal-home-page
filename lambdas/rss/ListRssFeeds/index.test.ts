@@ -1,0 +1,38 @@
+import {
+  DynamoDBDocumentClient,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
+import { mockClient } from "aws-sdk-client-mock";
+
+import { handler } from "./index";
+import {
+  mockContext,
+  mockEvent,
+  mockListResult,
+} from "../../mocks/mocks";
+
+const testTableName = "TEST_RSS_TABLE_NAME";
+
+describe("Index.js", () => {
+  // Create a mock for S3 at the beginning of your describe block.
+  const ddbMock = mockClient(DynamoDBDocumentClient);
+
+  // Set table name env var
+  process.env.RSS_TABLE = testTableName;
+
+  // Make sure to reset your mocks before each test to avoid issues.
+  beforeEach(() => {
+    ddbMock.reset();
+  });
+
+  it("Returns 200 Success when item is found", async () => {
+    ddbMock.on(QueryCommand).resolves({
+      Items: mockListResult,
+    });
+
+    const response = await handler(mockEvent, mockContext);
+    console.dir(response);
+    expect(response.statusCode).toBe(200);
+    expect(JSON.parse(response.body)).toStrictEqual(mockListResult);
+  });
+});
