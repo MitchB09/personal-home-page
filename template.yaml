@@ -195,6 +195,60 @@ Resources:
         Minify: true
         Target: es2020
 
+  ApiGetSettings:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/settings/GetUserSettings
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+              Resource:
+                - !GetAtt RssTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /settings/{id}
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
+  ApiUpdateSettings:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/settings/SaveUserSettings
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource:
+                - !GetAtt RssTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /settings/{id}
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
   S3Bucket:
     Type: AWS::S3::Bucket
   S3BucketPolicy:

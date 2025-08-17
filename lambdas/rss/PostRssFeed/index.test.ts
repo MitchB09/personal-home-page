@@ -10,7 +10,6 @@ import { handler } from "./index";
 import {
   mockContext,
   mockEvent,
-  mockYCombinatorResult,
 } from "../../mocks/mocks";
 
 // Mock jest and set the type
