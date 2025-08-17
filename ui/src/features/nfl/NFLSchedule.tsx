@@ -30,7 +30,7 @@ export const NFLSchedule = (): JSX.Element => {
   }
 
   return (
-    <Box ref={containerRef}>
+    <Box sx={{ height: "100%" }} ref={containerRef}>
       <Backdrop
         sx={theme => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
         open={isLoading}

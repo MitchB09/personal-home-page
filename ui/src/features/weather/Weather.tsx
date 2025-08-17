@@ -46,7 +46,7 @@ export const Weather = (): JSX.Element => {
   }
 
   return (
-    <Box ref={containerRef}>
+    <Box sx={{ height: "100%" }} ref={containerRef}>
       <Backdrop
         sx={theme => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
         open={false}
@@ -75,7 +75,7 @@ export const Weather = (): JSX.Element => {
         style={{ transformOrigin: "0 0 0" }}
         timeout={1000}
       >
-        <Box style={{ height: "300px", margin: "1em 0em" }}>
+        <Box style={{ margin: "1em 0em" }}>
           {selectedDay && (
             <WeatherChart selectedDay={selectedDay} data={data} />
           )}
