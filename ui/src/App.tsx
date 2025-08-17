@@ -44,7 +44,7 @@ export const App = () => {
               )}
               {data.homePageData.news && (
                 <Grid
-                  sx={{ width: "40vw", height: "55vh" }}
+                  sx={{ width: "40vw", height: "65vh" }}
                   component="div"
                   role="news"
                   className="tile"

@@ -31,6 +31,5 @@ export type RssSubscription = {
 }
 
 export type AddFeedForm = {
-  name: string
   url: string
 }

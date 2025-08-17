@@ -4,7 +4,7 @@ stack_name = "home-page-dev"
 resolve_s3 = true
 s3_prefix = "home-page-dev"
 region = "us-east-1"
-confirm_changeset = true
+confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
 parameter_overrides = "CertificateId=\"1bcfac7b-2374-4447-bfaa-2760e2dfb3f1\" Stage=\"dev\""
 image_repositories = []
@@ -14,8 +14,8 @@ stack_name = "home-page"
 resolve_s3 = true
 s3_prefix = "home-page"
 region = "us-east-1"
-confirm_changeset = true
+confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
-disable_rollback = true
+disable_rollback = false
 parameter_overrides = "CertificateId=\"1bcfac7b-2374-4447-bfaa-2760e2dfb3f1\" Stage=\"prod\""
 image_repositories = []

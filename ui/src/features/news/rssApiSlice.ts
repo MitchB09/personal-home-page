@@ -5,14 +5,19 @@ import type { AddFeedForm, Payload } from "./types"
 // Define a service using a base URL and expected endpoints
 export const rssApiSlice = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://home-api-prod.bilensky.ca/rss/",
+    baseUrl: "https://home-api-prod.bilensky.ca/rss/feeds",
   }),
   reducerPath: "rssApi",
-  // Tag types are used for caching and invalidation.
-  tagTypes: ["RSS", "Subscriptions"],
+  tagTypes: ["RSS"],
   endpoints: build => ({
     getRssSubsriptions: build.query<Payload[], string>({
-      query: id => "/",
+      query: () => "/",
+    }),
+    getRssFeed: build.query<Payload, string>({
+      query: (id: string) => {
+        return `/${id}`
+      },
+      providesTags: (result, error, id) => [{ type: "RSS", id: id }],
     }),
     createRssSubscription: build.mutation<Payload, AddFeedForm>({
       query: body => ({
@@ -23,21 +28,17 @@ export const rssApiSlice = createApi({
     }),
     deleteRssSubscription: build.mutation<undefined, string>({
       query: id => ({
-        url: "/feeds/" + id,
+        url: "/" + id,
         method: "DELETE",
       }),
-    }),
-    getRssFeeds: build.query<Payload[], string[]>({
-      query: (ids: string[]) => {
-        return "/feeds?" + ids.map(id => `id=${id}`).join("&")
-      },
+      invalidatesTags: (result, error, id) => [{ type: "RSS", id: id }],
     }),
   }),
 })
 
 export const {
   useGetRssSubsriptionsQuery,
-  useGetRssFeedsQuery,
+  useGetRssFeedQuery,
   useCreateRssSubscriptionMutation,
   useDeleteRssSubscriptionMutation,
 } = rssApiSlice

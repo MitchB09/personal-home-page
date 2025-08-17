@@ -1,11 +1,10 @@
 import { useState, type JSX } from "react"
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+
 import SettingsIcon from "@mui/icons-material/Settings"
-import { Box, Divider, Grid, IconButton, Paper, Tab, Tabs } from "@mui/material"
+import { Box, Paper, Tab, Tabs } from "@mui/material"
 import style from "./News.module.css"
 import { Feed } from "./components/Feed"
 import { useGetRssSubsriptionsQuery } from "./rssApiSlice"
-import { AddFeed } from "./components/AddFeed"
 import { ManageFeeds } from "./components/ManageFeeds"
 
 export const News = (): JSX.Element => {
@@ -23,53 +22,33 @@ export const News = (): JSX.Element => {
   }
 
   return (
-    <Paper sx={{ height: "100%" }}>
+    <Paper sx={{ height: "100%", display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Grid
-          container
-          direction="row"
-          justifyContent={"space-between"}
-          alignItems={"center"}
+        <Tabs
+          value={selected}
+          onChange={handleChange}
+          variant="scrollable"
+          scrollButtons="auto"
         >
-          <Grid size={10}>
-            <Tabs
-              value={selected}
-              onChange={handleChange}
-              variant="scrollable"
-              scrollButtons="auto"
-            >
-              {data.map(subscription => (
-                <Tab
-                  key={subscription.id}
-                  label={subscription.title}
-                  value={subscription.id}
-                  onClick={() => {
-                    setSelected(subscription.id)
-                  }}
-                />
-              ))}
-            </Tabs>
-          </Grid>
-          <Grid>
-            <Divider orientation="vertical" />
-          </Grid>
-          <Grid>
-            <IconButton
+          {data.map(subscription => (
+            <Tab
+              key={subscription.id}
+              label={subscription.title}
+              value={subscription.id}
               onClick={() => {
-                setSelected("add")
+                setSelected(subscription.id)
               }}
-            >
-              <AddCircleOutlineIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                setSelected("manage")
-              }}
-            >
-              <SettingsIcon />
-            </IconButton>
-          </Grid>
-        </Grid>
+            />
+          ))}
+          <Tab
+            key={"manage"}
+            value={"manage"}
+            icon={<SettingsIcon />}
+            onClick={() => {
+              setSelected("manage")
+            }}
+          />
+        </Tabs>
       </Box>
       {data.map(subscription => (
         <Box
@@ -80,9 +59,6 @@ export const News = (): JSX.Element => {
           <Feed id={subscription.id} />
         </Box>
       ))}
-      <Box key={"add"} className={style.container} hidden={selected !== "add"}>
-        <AddFeed />
-      </Box>
       <Box
         key={"manage"}
         className={style.container}
