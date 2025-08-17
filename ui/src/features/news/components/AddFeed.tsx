@@ -45,9 +45,7 @@ export const AddFeed = (): JSX.Element => {
       <Divider flexItem sx={{ flexGrow: 1, marginBottom: "1em" }} />
       <Button
         variant="contained"
-        label="subscribe"
         onClick={() => {
-          console.dir()
           createUser(formState)
             .then(response => {
               console.dir(response)
@@ -57,7 +55,7 @@ export const AddFeed = (): JSX.Element => {
             })
         }}
       >
-        Subscrbe
+        Subscribe
       </Button>
     </Stack>
   )

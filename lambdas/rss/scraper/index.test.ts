@@ -1,5 +1,6 @@
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { beforeEach, jest, describe, expect } from "@jest/globals";
 import { mockClient } from "aws-sdk-client-mock";
 import axios from "axios";
 import { readFileSync } from "fs";
@@ -54,9 +55,7 @@ describe("Index.js", () => {
 
     const response = await handler(undefined, mockContext);
 
-    console.dir(response);
     expect(response).toHaveLength(2);
-
     expect(response[0].channel.title).toBe("Hacker News");
     expect(response[1].channel.title).toBe("CBC | New Brunswick News");
 

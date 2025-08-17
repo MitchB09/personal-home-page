@@ -3,10 +3,11 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
 import { weatherApiSlice } from "../features/weather/weatherApiSlice"
 import { rssApiSlice } from "../features/news/rssApiSlice"
+import { nflApiSlice } from "../features/nfl/nflApiSlice"
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices(weatherApiSlice, rssApiSlice)
+const rootReducer = combineSlices(weatherApiSlice, rssApiSlice, nflApiSlice)
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>
 
@@ -20,7 +21,7 @@ export const makeStore = (preloadedState?: Partial<RootState>) => {
     middleware: getDefaultMiddleware => {
       return getDefaultMiddleware({
         serializableCheck: false,
-      }).concat(weatherApiSlice.middleware, rssApiSlice.middleware)
+      }).concat(weatherApiSlice.middleware, rssApiSlice.middleware, nflApiSlice.middleware)
     },
     preloadedState,
   })

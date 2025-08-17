@@ -1,13 +1,17 @@
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
-import { jest, describe, expect, test } from "@jest/globals";
+import { jest, describe, expect, beforeEach, it } from "@jest/globals";
 import { mockClient } from "aws-sdk-client-mock";
 import axios from "axios";
 import { readFileSync } from "fs";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 import { handler } from "./index";
-import { mockContext, mockEvent, mockYCombinatorResult } from "../../mocks/mocks";
+import {
+  mockContext,
+  mockEvent,
+  mockYCombinatorResult,
+} from "../../mocks/mocks";
 
 // Mock jest and set the type
 jest.mock("axios");
@@ -17,7 +21,7 @@ jest.mock("uuid");
 const mockedUuid = uuidv4 as jest.Mocked<typeof uuidv4>;
 
 const testTableName = "TEST_RSS_TABLE_NAME";
-const generatedUuid = '00000000-000a-0000-0000-00000000000a'
+const generatedUuid = "00000000-000a-0000-0000-00000000000a";
 
 describe("Index.js", () => {
   // Create a mock for S3 at the beginning of your describe block.
@@ -36,7 +40,7 @@ describe("Index.js", () => {
 
   mockedUuid.mockImplementation(() => {
     return generatedUuid;
-  })
+  });
 
   // Set table name env var
   process.env.RSS_TABLE = testTableName;

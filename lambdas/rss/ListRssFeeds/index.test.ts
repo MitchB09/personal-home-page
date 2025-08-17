@@ -2,6 +2,7 @@ import {
   DynamoDBDocumentClient,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { describe, expect, beforeEach, it } from "@jest/globals";
 import { mockClient } from "aws-sdk-client-mock";
 
 import { handler } from "./index";
@@ -31,7 +32,6 @@ describe("Index.js", () => {
     });
 
     const response = await handler(mockEvent, mockContext);
-    console.dir(response);
     expect(response.statusCode).toBe(200);
     expect(JSON.parse(response.body)).toStrictEqual(mockListResult);
   });
