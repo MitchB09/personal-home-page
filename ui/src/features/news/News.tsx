@@ -1,28 +1,34 @@
-import { useState, type JSX } from "react"
+import { useMemo, useState, type JSX } from "react"
 
-import SettingsIcon from "@mui/icons-material/Settings"
+import { Home, Settings } from "@mui/icons-material"
 import { Box, Paper, Tab, Tabs } from "@mui/material"
-import style from "./News.module.css"
 import { Feed } from "./components/Feed"
 import { useGetRssSubsriptionsQuery } from "./rssApiSlice"
 import { ManageFeeds } from "./components/ManageFeeds"
+import { FeedsHome } from "./components/FeedsHome"
+
+const homeTab = "list"
+const manageTab = "manage"
 
 export const News = (): JSX.Element => {
   const { data /* isError, isLoading isSuccess */ } =
     useGetRssSubsriptionsQuery("")
 
-  const [selected, setSelected] = useState("1")
-
+  const [selected, setSelected] = useState("list")
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setSelected(newValue)
   }
+
+  const feedIds = useMemo(() => {
+    return data?.map(feeds => feeds.id) ?? []
+  }, [data])
 
   if (!data) {
     return <>Loading...</>
   }
 
   return (
-    <Paper sx={{ height: "100%", display: 'flex', flexDirection: 'column' }}>
+    <Paper sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={selected}
@@ -30,6 +36,14 @@ export const News = (): JSX.Element => {
           variant="scrollable"
           scrollButtons="auto"
         >
+          <Tab
+            key={homeTab}
+            value={homeTab}
+            icon={<Home />}
+            onClick={() => {
+              setSelected(homeTab)
+            }}
+          />
           {data.map(subscription => (
             <Tab
               key={subscription.id}
@@ -41,28 +55,25 @@ export const News = (): JSX.Element => {
             />
           ))}
           <Tab
-            key={"manage"}
-            value={"manage"}
-            icon={<SettingsIcon />}
+            key={manageTab}
+            value={manageTab}
+            icon={<Settings />}
             onClick={() => {
-              setSelected("manage")
+              setSelected(manageTab)
             }}
           />
         </Tabs>
       </Box>
-      {data.map(subscription => (
-        <Box
-          key={subscription.id}
-          className={style.container}
-          hidden={selected !== subscription.id}
-        >
-          <Feed id={subscription.id} />
-        </Box>
-      ))}
+      <Box key={homeTab} sx={{ height: "100%" }} hidden={selected !== homeTab}>
+        <FeedsHome feeds={data} selectFeed={setSelected} />
+      </Box>
+      <Box sx={{ height: "100%" }} hidden={!feedIds.includes(selected)}>
+        {feedIds.includes(selected) && <Feed id={selected} />}
+      </Box>
       <Box
-        key={"manage"}
-        className={style.container}
-        hidden={selected !== "manage"}
+        key={manageTab}
+        sx={{ height: "100%" }}
+        hidden={selected !== manageTab}
       >
         <ManageFeeds feeds={data} />
       </Box>

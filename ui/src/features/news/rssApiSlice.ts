@@ -12,12 +12,19 @@ export const rssApiSlice = createApi({
   endpoints: build => ({
     getRssSubsriptions: build.query<Payload[], string>({
       query: () => "/",
+      providesTags: ["RSS"],
     }),
     getRssFeed: build.query<Payload, string>({
       query: (id: string) => {
         return `/${id}`
       },
       providesTags: (result, error, id) => [{ type: "RSS", id: id }],
+    }),
+    refreshRssFeed: build.mutation<Payload, string>({
+      query: (id: string) => {
+        return `/${id}?refresh=true`
+      },
+      invalidatesTags: (result, error, id) => [{ type: "RSS", id: id }],
     }),
     createRssSubscription: build.mutation<Payload, AddFeedForm>({
       query: body => ({
@@ -33,6 +40,7 @@ export const rssApiSlice = createApi({
       }),
       invalidatesTags: (result, error, id) => [{ type: "RSS", id: id }],
     }),
+
   }),
 })
 
@@ -41,4 +49,5 @@ export const {
   useGetRssFeedQuery,
   useCreateRssSubscriptionMutation,
   useDeleteRssSubscriptionMutation,
+  useRefreshRssFeedMutation,
 } = rssApiSlice

@@ -6,6 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import {
   Box,
   Button,
+  Divider,
   FormControl,
   Grid,
   IconButton,
@@ -34,7 +35,7 @@ export const ManageFeeds = (props: ManageFeedsProps): JSX.Element => {
   const [newFeed, setNewFeed] = useState<string>("")
 
   return (
-    <Stack direction="column" style={{ height: "100%" }}>
+    <Stack direction="column" style={{ height: "100%", margin: "1em" }}>
       {feeds.map(feed => (
         <Box key={feed.id}>
           <Grid container>
@@ -54,6 +55,7 @@ export const ManageFeeds = (props: ManageFeedsProps): JSX.Element => {
           </Grid>
         </Box>
       ))}
+      <Divider />
       <Box>
         {addingFeed ? (
           <FormControl fullWidth variant="standard">
@@ -106,6 +108,7 @@ export const ManageFeeds = (props: ManageFeedsProps): JSX.Element => {
         ) : (
           <Button
             variant="outlined"
+            sx={{ marginTop: "1em" }}
             onClick={() => {
               setAddingFeed(true)
             }}

@@ -34,7 +34,7 @@ export const App = () => {
             <Grid container direction="row">
               {data.homePageData.weather && (
                 <Grid
-                  sx={{ width: "40vw", height: "30vh" }}
+                  sx={{ width: "40vw", height: "40vh" }}
                   component="div"
                   role="weather"
                   className="tile"
@@ -44,7 +44,7 @@ export const App = () => {
               )}
               {data.homePageData.news && (
                 <Grid
-                  sx={{ width: "40vw", height: "65vh" }}
+                  sx={{ width: "40vw", height: "50vh" }}
                   component="div"
                   role="news"
                   className="tile"

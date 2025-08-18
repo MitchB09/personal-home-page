@@ -1,4 +1,4 @@
-import { useMemo, useState, type JSX } from "react"
+import { useEffect, useMemo, useState, type JSX } from "react"
 
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft"
 import ArrowRightIcon from "@mui/icons-material/ArrowRight"
@@ -11,10 +11,12 @@ import {
   List,
   ListItem,
   Skeleton,
+  Tooltip,
   Typography,
 } from "@mui/material"
 import type { Item } from "../types"
-import { useGetRssFeedQuery } from "../rssApiSlice"
+import { useGetRssFeedQuery, useRefreshRssFeedMutation } from "../rssApiSlice"
+import styles from "./Feed.module.css"
 import { format } from "date-fns"
 
 export type FeedProps = {
@@ -26,39 +28,57 @@ const pageSize = 5
 export const Feed = (props: FeedProps): JSX.Element => {
   const { id } = props
 
-  const { data /* isError, isLoading isSuccess */ } = useGetRssFeedQuery(id)
+  const { data, isLoading, isFetching /* isError, isLoading isSuccess */ } =
+    useGetRssFeedQuery(id)
+  const [refreshFeed] = useRefreshRssFeedMutation()
   const feed = data ? data.rssData?.channel : undefined
 
+  const [spinning, setSpinning] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isFetching) {
+      setSpinning(false);
+    }
+  }, [isFetching])
+
   const [page, setPage] = useState<number>(1)
+  useEffect(() => {
+    setPage(1)
+  }, [id])
+
   const maxPage = useMemo(() => {
     if (data?.rssData) {
-      return data.rssData.channel.item.length / pageSize
+      return Math.ceil(data.rssData.channel.item.length / pageSize)
     } else {
       return 0
     }
   }, [data])
 
   return (
-    <Grid container style={{ height: "100%" }} flexDirection="column">
-      <Grid flexGrow={1}>
-        {feed?.item.length ? (
+    <Grid container sx={{ height: "100%" }} flexDirection="column">
+      <Grid flexGrow={1} sx={{ width: "100%" }}>
+        {!isLoading && feed?.item.length ? (
           <List>
             {feed.item
               .filter((_, index) => index >= (page - 1) * 5 && index < page * 5)
               .map((item: Item) => (
-                <Link
-                  key={item.guid}
-                  href={item.link}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <ListItem
+                <Tooltip title={item.title}>
+                  <Link
                     key={item.guid}
-                    sx={{ fontSize: "0.75rem", width: "100%" }}
+                    href={item.link}
+                    target="_blank"
+                    rel="noreferrer"
                   >
-                    <Typography variant="body2">{item.title}</Typography>
-                  </ListItem>
-                </Link>
+                    <ListItem
+                      key={item.guid}
+                      sx={{ fontSize: "0.75rem", width: "100%" }}
+                    >
+                      <Typography variant="body2" noWrap sx={{ width: "100%" }}>
+                        {item.title}
+                      </Typography>
+                    </ListItem>
+                  </Link>
+                </Tooltip>
               ))}
           </List>
         ) : (
@@ -121,12 +141,15 @@ export const Feed = (props: FeedProps): JSX.Element => {
               </Grid>
               <Grid>
                 <span>
-                  <Typography component='span' variant="subtitle2">
+                  <Typography component="span" variant="subtitle2">
                     {`Updated: ${format(new Date(data.lastUpdated), "h:mm aa")}`}
                   </Typography>
                   <IconButton
+                    //className={styles.rotating}
+                    className={spinning ? styles.rotating : ""}
                     onClick={() => {
-                      console.dir('reload')
+                      setSpinning(true);
+                      void refreshFeed(data.id)
                     }}
                   >
                     <SyncIcon />
