@@ -59,12 +59,11 @@ Resources:
           Type: ScheduleV2
           Properties:
             Name: !Sub ScrapeRssFeeds-${Stage}-Schedule
-            ScheduleExpression: rate(1 day)
+            #ScheduleExpression: cron(minutes hours day_of_month month day_of_week year)
+            ScheduleExpression: cron(30 10-23 * * ? *)
             FlexibleTimeWindow:
               Mode: FLEXIBLE
               MaximumWindowInMinutes: 5
-            StartDate: '2025-08-20T12:00:00.000Z'
-            EndDate: '2025-08-21T12:00:00.000Z'
             ScheduleExpressionTimezone: UTC
     Metadata:
       BuildMethod: esbuild
