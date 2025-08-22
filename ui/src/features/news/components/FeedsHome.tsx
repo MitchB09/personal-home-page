@@ -1,6 +1,6 @@
 import { type JSX } from "react"
 
-import { Box, Grid, Link, Stack, Typography } from "@mui/material"
+import { Box, Divider, Grid, Link, Stack, Typography } from "@mui/material"
 
 import type { Payload } from "../types"
 
@@ -38,6 +38,7 @@ export const FeedsHome = (props: FeedsHomeProps): JSX.Element => {
         ))}
       </Box>
       <Box sx={{ flexGrow: 1 }} />
+      <Divider />
       <Stack justifyContent={"space-between"} direction={"row"}>
         <Link
           onClick={() => {

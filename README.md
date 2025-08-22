@@ -4,9 +4,30 @@ https://home.bilensky.ca
 Personal home page and testing ground for vite apps
 
 
+## Infrastructure
+
+To build the AWS SAM template first execute the following to compile template.yaml:
+
+```bash
+sam build
+sam deploy --guided
+```
+
+Deploying Infra to dev environment
+
+```bash
+sam deploy --config-file samconfig.toml
+```
+
+Deploying to Prod
+
+```bash
+sam deploy --config-file samconfig.toml --config-env prod
+```
+
 ## Running UI
 
-To build and run the ui for the first time, execute the following scripts. On subsequent runs, only running `npm start` in the `ui` folder is required
+To build and run the ui for the UI, execute the following scripts. 
 
 ```bash
 cd ui
@@ -14,24 +35,10 @@ npm install
 npm start
 ```
 
-## Deploying application
-### Deploying Dev
-
-To build and deploy your application for the first time, run the following in your shell:
+Deploying the UI can be done by running a build and syncing the files to S3
 
 ```bash
-sam build
-sam deploy --guided
+npm run build
+aws s3 sync dist/ s3://S3_BUCKET_NAME
 ```
-
-Deploying to dev environment
-
-```bash
-sam deploy --config-file samconfig.toml
-```
-
-```bash
-sam deploy --config-file samconfig.toml --config-env prod
-```
-
 

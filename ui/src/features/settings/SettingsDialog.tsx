@@ -10,22 +10,25 @@ import {
   FormGroup,
   Switch,
 } from "@mui/material"
-import { useUpdateUserSettingsMutation } from "./settingsApiSlice"
+import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from "./settingsApiSlice"
 import type { Payload } from "./types"
 
 export type SettingsDialogProps = {
-  data: Payload
   open: boolean
   onClose: () => void
 }
 
 export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
-  const { data, open, onClose } = props
+  const { open, onClose } = props
+  const { data } = useGetUserSettingsQuery("1")
+  const [formData, setFormData] = useState<Payload | undefined>(data)
 
-  const [formData, setFormData] = useState<Payload>(data)
   const [updateUserSettings] = useUpdateUserSettingsMutation()
 
   const saveUserSettings = () => {
+    if (!formData) {
+      throw Error('No Data Found')
+    }
     updateUserSettings(formData)
       .then(() => {
         onClose()
@@ -39,7 +42,7 @@ export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
     <Dialog onClose={onClose} open={open}>
       <DialogTitle>Set backup account</DialogTitle>
       <DialogContent>
-        <FormGroup>
+        {formData && <FormGroup>
           {Object.entries(formData.homePageData).map(([key, value]) => {
             return (
               <FormControlLabel
@@ -61,7 +64,7 @@ export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
               />
             )
           })}
-        </FormGroup>
+        </FormGroup>}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

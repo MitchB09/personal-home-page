@@ -1,17 +1,27 @@
 import React, { type JSX } from "react"
 
+import LogoutIcon from "@mui/icons-material/Logout"
 import SettingsIcon from "@mui/icons-material/Settings"
 import AppBar from "@mui/material/AppBar"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import MenuIcon from "@mui/icons-material/Menu"
-import { useGetUserSettingsQuery } from "./features/settings/settingsApiSlice"
 import { SettingsDialog } from "./features/settings/SettingsDialog"
+import { useAppSelector } from "./app/hooks"
+import { selectUser } from "./features/auth/authSlice"
+
+const logout = () => {
+  const clientId = import.meta.env.VITE_USERPOOL_CLIENT_ID as string
+  const logoutUri = import.meta.env.VITE_REDIRECT_URL as string
+  const cognitoDomain =
+    "https://home-page-dev-dev.auth.us-east-1.amazoncognito.com"
+  window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`
+}
 
 export const MenuAppBar = (): JSX.Element => {
-  const { data } = useGetUserSettingsQuery("1")
   const [open, setOpen] = React.useState(false)
+  const user = useAppSelector(selectUser)
 
   return (
     <AppBar position="static">
@@ -29,21 +39,38 @@ export const MenuAppBar = (): JSX.Element => {
           Personal Home Page
         </Typography>
         <div>
-          <IconButton
-            size="large"
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={() => { setOpen(true)}}
-            color="inherit"
-          >
-            <SettingsIcon />
-          </IconButton>
+          {user && (
+            <>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={() => {
+                  setOpen(true)
+                }}
+                color="inherit"
+              >
+                <SettingsIcon />
+              </IconButton>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={() => {
+                  logout()
+                }}
+                color="inherit"
+              >
+                <LogoutIcon />
+              </IconButton>
+            </>
+          )}
         </div>
       </Toolbar>
-      {data && (
+      {user && (
         <SettingsDialog
-          data={data}
           open={open}
           onClose={() => {
             setOpen(false)

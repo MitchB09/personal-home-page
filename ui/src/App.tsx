@@ -1,13 +1,15 @@
+import { useEffect } from "react"
+
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
-import { Backdrop, CircularProgress, Grid } from "@mui/material"
+import { Button } from "@mui/material"
+import { useAuth } from "react-oidc-context"
 
 import "./App.css"
-import { Weather } from "./features/weather/Weather"
-import { News } from "./features/news/News"
-import { NFLSchedule } from "./features/nfl/NFLSchedule"
-import { useGetUserSettingsQuery } from "./features/settings/settingsApiSlice"
 import { MenuAppBar } from "./MenuAppBar"
+import { useAppDispatch, useAppSelector } from "./app/hooks"
+import { selectUser, setCredentials } from "./features/auth/authSlice"
+import { Home } from "./Home"
 
 export const darkTheme = createTheme({
   palette: {
@@ -16,7 +18,15 @@ export const darkTheme = createTheme({
 })
 
 export const App = () => {
-  const { data, isLoading } = useGetUserSettingsQuery("1")
+  const auth = useAuth()
+  const dispatch = useAppDispatch()
+  const user = useAppSelector(selectUser)
+
+  useEffect(() => {
+    if (auth.user) {
+      dispatch(setCredentials({ user: auth.user }))
+    }
+  }, [dispatch, auth.user])
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -24,45 +34,16 @@ export const App = () => {
       <MenuAppBar />
       <div className="App">
         <header className="App-header">
-          {isLoading || !data ? (
-            <Backdrop
-              open={true}
+          {!user ? (
+            <Button
+              onClick={() => {
+                void auth.signinRedirect()
+              }}
             >
-              <CircularProgress color="inherit" />
-            </Backdrop>
+              Sign in
+            </Button>
           ) : (
-            <Grid container direction="row">
-              {data.homePageData.weather && (
-                <Grid
-                  sx={{ width: "40vw", height: "40vh" }}
-                  component="div"
-                  role="weather"
-                  className="tile"
-                >
-                  <Weather />
-                </Grid>
-              )}
-              {data.homePageData.news && (
-                <Grid
-                  sx={{ width: "40vw", height: "50vh" }}
-                  component="div"
-                  role="news"
-                  className="tile"
-                >
-                  <News />
-                </Grid>
-              )}
-              {data.homePageData.nfl && (
-                <Grid
-                  sx={{ width: "40vw", height: "55vh" }}
-                  component="div"
-                  role="news"
-                  className="tile"
-                >
-                  <NFLSchedule />
-                </Grid>
-              )}
-            </Grid>
+            <Home />
           )}
         </header>
       </div>

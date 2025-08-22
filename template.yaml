@@ -11,9 +11,8 @@ Parameters:
     Description: The Stage where the application is running in, e.g., dev, prod.
 
 Conditions:
-  IsProduction: !Equals
-    - !Ref Stage
-    - prod
+  IsProduction: 
+    !Equals [!Ref Stage, "prod"]
 
 Globals:
   Function:
@@ -25,6 +24,66 @@ Globals:
         RSS_TABLE: !Ref RssTable
 
 Resources:
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      UserPoolName: !Sub '${AWS::StackName}-${Stage}-user-pool'
+      UsernameConfiguration:
+        CaseSensitive: false
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: True
+          RequireNumbers: False
+          RequireSymbols: True
+          RequireUppercase: True
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub '${AWS::StackName}-${Stage}-user-pool-client'
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthFlowsUserPoolClient: true
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs:
+        - !If
+          - IsProduction
+          - !Sub 'https://home.bilensky.ca'
+          - !Sub 'https://home-${Stage}.bilensky.ca'
+        - !If
+          - IsProduction
+          - !Ref "AWS::NoValue"
+          - 'https://local.bilensky.ca:3000'
+      LogoutURLs:
+        - !If
+          - IsProduction
+          - !Sub 'https://home.bilensky.ca'
+          - !Sub 'https://home-${Stage}.bilensky.ca'
+        - !If
+          - IsProduction
+          - !Ref "AWS::NoValue"
+          - 'https://local.bilensky.ca:3000'
+      AllowedOAuthScopes:
+        - email
+        - openid
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      Domain: !Sub '${AWS::StackName}-${Stage}'
+      UserPoolId: !Ref UserPool
+
   RssTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -84,6 +143,12 @@ Resources:
         DomainName: !Sub home-api-${Stage}.bilensky.ca
         CertificateArn: !Sub arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/${CertificateId}
         SecurityPolicy: TLS_1_2
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt UserPool.Arn
 
   ApiListRssFeeds:
     Type: AWS::Serverless::Function
@@ -315,3 +380,9 @@ Outputs:
   ApiGatewayUrl:
     Description: API Gateway endpoint URL
     Value: !Sub https://home-api-${Stage}.bilensky.ca/
+  CognitoUserPool: 
+    Description: Cognito User Pool Id
+    Value: !Ref UserPool
+  CognitoClient: 
+    Description: Cognito Client Id
+    Value: !Ref UserPoolClient

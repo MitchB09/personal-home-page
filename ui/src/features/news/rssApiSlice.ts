@@ -1,11 +1,24 @@
 // Need to use the React-specific entry point to import `createApi`
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { AddFeedForm, Payload } from "./types"
+import type { RootState } from "../../app/store"
+
+const url = import.meta.env.VITE_PERSONAL_DOMAIN as string
 
 // Define a service using a base URL and expected endpoints
 export const rssApiSlice = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://home-api-prod.bilensky.ca/rss/feeds",
+    baseUrl: url + "/rss/feeds",
+    prepareHeaders: (headers, { getState }) => {
+      // Add common headers like Authorization
+      const rootState = getState() as RootState
+      const token = rootState.auth.token
+      if (!token) {
+        throw new Error("No Auth Token Found")
+      }
+      headers.set("Authorization", `Bearer ${token}`)
+      return headers
+    },
   }),
   reducerPath: "rssApi",
   tagTypes: ["RSS"],
@@ -18,13 +31,13 @@ export const rssApiSlice = createApi({
       query: (id: string) => {
         return `/${id}`
       },
-      providesTags: (result, error, id) => [{ type: "RSS", id: id }],
+      providesTags: (_result, _error, id) => [{ type: "RSS", id: id }],
     }),
     refreshRssFeed: build.mutation<Payload, string>({
       query: (id: string) => {
         return `/${id}?refresh=true`
       },
-      invalidatesTags: (result, error, id) => [{ type: "RSS", id: id }],
+      invalidatesTags: (_result, _error, id) => [{ type: "RSS", id: id }],
     }),
     createRssSubscription: build.mutation<Payload, AddFeedForm>({
       query: body => ({
@@ -38,9 +51,8 @@ export const rssApiSlice = createApi({
         url: "/" + id,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, id) => [{ type: "RSS", id: id }],
+      invalidatesTags: (_result, _error, id) => [{ type: "RSS", id: id }],
     }),
-
   }),
 })
 
