@@ -10,9 +10,9 @@ export const Home = (): JSX.Element => {
   const { data, isLoading } = useGetUserSettingsQuery("1")
 
   return (
-    <Box>
+    <Box sx={{ position: "relative", width: '100%', height: '100%' }}>
       {isLoading || !data ? (
-        <Backdrop open={true}>
+        <Backdrop open={true} sx={{ position: "absolute" }}>
           <CircularProgress color="inherit" />
         </Backdrop>
       ) : (

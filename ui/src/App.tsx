@@ -24,9 +24,13 @@ export const App = () => {
 
   useEffect(() => {
     if (auth.user) {
-      dispatch(setCredentials({ user: auth.user }))
+      if (auth.user.expired) {
+        void auth.removeUser()
+      } else {
+        dispatch(setCredentials({ user: auth.user }))
+      }
     }
-  }, [dispatch, auth.user])
+  }, [dispatch, auth])
 
   return (
     <ThemeProvider theme={darkTheme}>

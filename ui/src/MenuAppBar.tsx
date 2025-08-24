@@ -1,7 +1,10 @@
 import React, { type JSX } from "react"
 
-import LogoutIcon from "@mui/icons-material/Logout"
-import SettingsIcon from "@mui/icons-material/Settings"
+import {
+  Logout as LogoutIcon,
+  Settings as SettingsIcon,
+  Person as PersonIcon,
+} from "@mui/icons-material"
 import AppBar from "@mui/material/AppBar"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
@@ -10,6 +13,8 @@ import MenuIcon from "@mui/icons-material/Menu"
 import { SettingsDialog } from "./features/settings/SettingsDialog"
 import { useAppSelector } from "./app/hooks"
 import { selectUser } from "./features/auth/authSlice"
+import { UserDialog } from "./features/auth/UserDialog"
+
 
 const logout = () => {
   const clientId = import.meta.env.VITE_USERPOOL_CLIENT_ID as string
@@ -21,6 +26,8 @@ const logout = () => {
 
 export const MenuAppBar = (): JSX.Element => {
   const [open, setOpen] = React.useState(false)
+  const [userDialogOpen, setUserDialogOpen] = React.useState(false)
+
   const user = useAppSelector(selectUser)
 
   return (
@@ -59,6 +66,18 @@ export const MenuAppBar = (): JSX.Element => {
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={() => {
+                  setUserDialogOpen(true)
+                }}
+                color="inherit"
+              >
+                <PersonIcon />
+              </IconButton>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={() => {
                   logout()
                 }}
                 color="inherit"
@@ -74,6 +93,14 @@ export const MenuAppBar = (): JSX.Element => {
           open={open}
           onClose={() => {
             setOpen(false)
+          }}
+        />
+      )}
+      {user && (
+        <UserDialog
+          open={userDialogOpen}
+          onClose={() => {
+            setUserDialogOpen(false)
           }}
         />
       )}
