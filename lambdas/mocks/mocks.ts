@@ -99,6 +99,29 @@ export const mockEvent = {
   isBase64Encoded: false,
 };
 
+export type MockEventConfig = {
+  body?: object;
+  inludeAuth?: boolean;
+};
+
+export const createMockEvent = ({
+  body,
+  inludeAuth = true,
+}: MockEventConfig) => {
+  const extraHeaders = {
+    ...mockEvent.headers,
+  }
+
+  if (inludeAuth) {
+    extraHeaders['Authorization'] = mockAuthHeader
+  }
+
+  return { ...mockEvent,
+    headers: extraHeaders,
+    body: body ? JSON.stringify(body): null
+   };
+};
+
 export const mockContext = {
   callbackWaitsForEmptyEventLoop: false,
   functionName: "",
@@ -121,6 +144,11 @@ export const mockContext = {
     throw new Error("Function not implemented.");
   },
 };
+
+export const mockUser = "mitchb09"
+
+export const mockAuthHeader =
+  "Bearer eyJraWQiOiJjRDBhRndoZUNEQUdkYnQzbkJXWG9VdUVLN1d2OUxkcVBTeFZ6MnhCZkZrPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiM29BY2lIbERheElROTk3SnN5RHpMZyIsInN1YiI6IjM0NDgwNDI4LWUwYTEtNzAzMS02OTM3LTQ5MThmZmQ0NWJhZSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzBKOTN3VU1LQyIsImNvZ25pdG86dXNlcm5hbWUiOiJtaXRjaGIwOSIsIm9yaWdpbl9qdGkiOiI4MGRiZDU1ZC1hM2U4LTQ3NWEtYTJmMi01MzVkYWVlMjQyMmIiLCJhdWQiOiIzOHZjMGZobGtkc3ViMTBrdmM5OG9wbXRxNiIsImV2ZW50X2lkIjoiYjYwZTYwMDUtOTFmNS00Mzc2LTlhZTAtOTBjMDFjMzgzYjk4IiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE3NTY2MDQ1OTksImV4cCI6MTc1NjcwMDg2NSwiaWF0IjoxNzU2Njk3MjY1LCJqdGkiOiI5YjlhM2M1MS1iMWIyLTQ3NjUtOWRkNy0xOGRjZTFmYjcwN2UifQ.d5ItkZayuOYMMXdB3LgmDHubsvirdWQKwskUtR01RuGbZdJ3_hPKZPzHKf9CGNpOurojFifqGQUPtg9Cb6ymjwjJFpfR4xkrmsnX9acs9KDiBFr2ZMX3riaEQZzW1cF4ZUp82aeuSFkzY4ujA-e4aHxaXe_k5qttpPxjlP-vItez5RimY8ZPph2Dw4oJJMPUos3IfaVK9IGIA5Z-0T4S6EisBLhNRototCU9ImYLlBGqkzwUV0E1niU15N74LWtDoWBwa_l3JMoFRfqNCXbPR3JPlLBHzSftNUd8QdUiqih_MeL8lhb9EeVFgLZ7_cnvMv5zGTHsEnzCj7YkhVOfsQ";
 
 export const mockListResult = [
   {

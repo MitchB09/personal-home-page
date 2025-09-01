@@ -5,12 +5,13 @@ import { News } from "./features/news/News"
 import { NFLSchedule } from "./features/nfl/NFLSchedule"
 import { Weather } from "./features/weather/Weather"
 import { useGetUserSettingsQuery } from "./features/settings/settingsApiSlice"
+import { DailyTodoList } from "./features/todocalendar/DailyTodoList"
 
 export const Home = (): JSX.Element => {
   const { data, isLoading } = useGetUserSettingsQuery("1")
 
   return (
-    <Box sx={{ position: "relative", width: '100%', height: '100%' }}>
+    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
       {isLoading || !data ? (
         <Backdrop open={true} sx={{ position: "absolute" }}>
           <CircularProgress color="inherit" />
@@ -19,7 +20,8 @@ export const Home = (): JSX.Element => {
         <Grid container direction="row">
           {data.homePageData.weather && (
             <Grid
-              sx={{ width: "40vw", height: "40vh" }}
+              size={{ xs: 12, sm: 12, md: 6 }}
+              sx={{ height: "40vh" }}
               component="div"
               role="weather"
               className="tile"
@@ -27,9 +29,21 @@ export const Home = (): JSX.Element => {
               <Weather />
             </Grid>
           )}
+          {data.homePageData.todos && (
+            <Grid
+              size={{ xs: 12, sm: 12, md: 6 }}
+              sx={{ height: "60vh" }}
+              component="div"
+              role="todos"
+              className="tile"
+            >
+              <DailyTodoList />
+            </Grid>
+          )}
           {data.homePageData.news && (
             <Grid
-              sx={{ width: "40vw", height: "50vh" }}
+              size={{ xs: 12, sm: 12, md: 6 }}
+              sx={{ height: "50vh" }}
               component="div"
               role="news"
               className="tile"
@@ -39,7 +53,8 @@ export const Home = (): JSX.Element => {
           )}
           {data.homePageData.nfl && (
             <Grid
-              sx={{ width: "40vw", height: "55vh" }}
+              size={{ xs: 12, sm: 12, md: 6 }}
+              sx={{ height: "55vh" }}
               component="div"
               role="news"
               className="tile"

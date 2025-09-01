@@ -8,8 +8,13 @@ import { useAuth } from "react-oidc-context"
 import "./App.css"
 import { MenuAppBar } from "./MenuAppBar"
 import { useAppDispatch, useAppSelector } from "./app/hooks"
-import { selectUser, setCredentials } from "./features/auth/authSlice"
+import {
+  selectToken,
+  selectUser,
+  setCredentials,
+} from "./features/auth/authSlice"
 import { Home } from "./Home"
+import api from "./api"
 
 export const darkTheme = createTheme({
   palette: {
@@ -20,6 +25,7 @@ export const darkTheme = createTheme({
 export const App = () => {
   const auth = useAuth()
   const dispatch = useAppDispatch()
+  const token = useAppSelector(selectToken)
   const user = useAppSelector(selectUser)
 
   useEffect(() => {
@@ -32,6 +38,15 @@ export const App = () => {
     }
   }, [dispatch, auth])
 
+  useEffect(() => {
+    if (token) {
+      api.interceptors.request.use(config => {
+        config.headers.Authorization = token
+        return config
+      })
+    }
+  }, [token])
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -41,7 +56,11 @@ export const App = () => {
           {!user ? (
             <Button
               onClick={() => {
-                void auth.signinRedirect()
+                try {
+                  void auth.signinRedirect()
+                } catch {
+                  void auth.signinRedirect()
+                }
               }}
             >
               Sign in

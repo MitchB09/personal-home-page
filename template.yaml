@@ -22,6 +22,7 @@ Globals:
     Environment:
       Variables:
         RSS_TABLE: !Ref RssTable
+        TASKS_TABLE: !Ref TasksTable
 
 Resources:
 
@@ -96,6 +97,21 @@ Resources:
         - AttributeName: entityType
           KeyType: HASH
         - AttributeName: id
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  TasksTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: date
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: date
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
@@ -300,6 +316,60 @@ Resources:
           Type: Api
           Properties:
             Path: /settings/{id}
+            Method: post
+            RestApiId: !Ref ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
+  ApiGetTasks:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/tasks/GetTasks
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+              Resource:
+                - !GetAtt TasksTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /tasks
+            Method: get
+            RestApiId: !Ref ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
+  ApiPostTasks:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/tasks/PostTasks
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:PutItem
+                - dynamodb:BatchWriteItem
+              Resource:
+                - !GetAtt TasksTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /tasks
             Method: post
             RestApiId: !Ref ApiGatewayApi
     Metadata:

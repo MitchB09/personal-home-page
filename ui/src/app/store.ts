@@ -5,6 +5,8 @@ import { weatherApiSlice } from "../features/weather/weatherApiSlice"
 import { rssApiSlice } from "../features/news/rssApiSlice"
 import { nflApiSlice } from "../features/nfl/nflApiSlice"
 import { settingsApiSlice } from "../features/settings/settingsApiSlice"
+import { todosSlice } from "../features/todocalendar/todosSlice"
+
 import { authSlice } from "../features/auth/authSlice"
 
 // `combineSlices` automatically combines the reducers using
@@ -15,6 +17,7 @@ const rootReducer = combineSlices(
   rssApiSlice,
   nflApiSlice,
   authSlice,
+  todosSlice,
 )
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>

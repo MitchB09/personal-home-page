@@ -1,4 +1,4 @@
-import { useState, type JSX } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import {
   Button,
@@ -10,8 +10,11 @@ import {
   FormGroup,
   Switch,
 } from "@mui/material"
-import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from "./settingsApiSlice"
-import type { Payload } from "./types"
+import {
+  useGetUserSettingsQuery,
+  useUpdateUserSettingsMutation,
+} from "./settingsApiSlice"
+import { AppType, type Payload } from "./types"
 
 export type SettingsDialogProps = {
   open: boolean
@@ -23,11 +26,15 @@ export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
   const { data } = useGetUserSettingsQuery("1")
   const [formData, setFormData] = useState<Payload | undefined>(data)
 
+  useEffect(() => {
+    setFormData(data)
+  }, [data])
+
   const [updateUserSettings] = useUpdateUserSettingsMutation()
 
   const saveUserSettings = () => {
     if (!formData) {
-      throw Error('No Data Found')
+      throw Error("No Data Found")
     }
     updateUserSettings(formData)
       .then(() => {
@@ -40,31 +47,35 @@ export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
 
   return (
     <Dialog onClose={onClose} open={open}>
-      <DialogTitle>Set backup account</DialogTitle>
+      <DialogTitle>Select Apps</DialogTitle>
       <DialogContent>
-        {formData && <FormGroup>
-          {Object.entries(formData.homePageData).map(([key, value]) => {
-            return (
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={value}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      setFormData({
-                        ...formData,
-                        homePageData: {
-                          ...formData.homePageData,
-                          [key]: event.target.checked,
-                        },
-                      })
-                    }}
-                  />
-                }
-                label={key}
-              />
-            )
-          })}
-        </FormGroup>}
+        {formData && (
+          <FormGroup>
+            {Object.values(AppType).map(key => {
+              return (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.homePageData[key]}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>,
+                      ) => {
+                        setFormData({
+                          ...formData,
+                          homePageData: {
+                            ...formData.homePageData,
+                            [key]: event.target.checked,
+                          },
+                        })
+                      }}
+                    />
+                  }
+                  label={key}
+                />
+              )
+            })}
+          </FormGroup>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
