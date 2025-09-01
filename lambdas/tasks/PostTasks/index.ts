@@ -3,14 +3,10 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
-  PutCommand,
-  QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 import { Context } from "aws-lambda";
 import { jwtDecode, JwtPayload } from "jwt-decode";
-
-const entityType = "TASKS";
 
 export type Task = {
   completed: boolean;
@@ -43,6 +39,7 @@ export const handler = async (event: any, context: Context) => {
     const item = {
       ...value,
       userId: username,
+      lastUpdated: Date.now()
     };
     return {
       PutRequest: {

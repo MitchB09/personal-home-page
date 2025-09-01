@@ -15,12 +15,16 @@ import { AddTaskForm } from "./components/AddTaskForm"
 import { NumberedComponent } from "./components/NumberedComponent"
 import { SimpleTaskCompoenent } from "./components/SimpleTaskComponent"
 import {
+  addTask,
+  FormMode,
   getWeek,
   selectCreating,
   selectHasChanges,
+  selectMode,
   selectSync,
   selectTodoList,
   setCreating,
+  setMode,
   setTodoList,
   syncWeek,
 } from "./todosSlice"
@@ -31,13 +35,14 @@ import {
   MoreHoriz,
   Sync,
   ErrorOutline,
+  Settings,
 } from "@mui/icons-material"
 import { isNumberedTask, toDateString } from "./utils"
+import { TaskLibrary } from "./components/TaskLibrary"
 
 export const DailyTodoList = (): JSX.Element => {
-  //const { data /* isError, isLoading isSuccess */ } = useGetRssSubsriptionsQuery("")
-
   const todoList = useAppSelector(selectTodoList)
+  const mode = useAppSelector(selectMode)
   const creating = useAppSelector(selectCreating)
   const hasChanges = useAppSelector(selectHasChanges)
   const sync = useAppSelector(selectSync)
@@ -85,54 +90,33 @@ export const DailyTodoList = (): JSX.Element => {
     else return <Check />
   }
 
-  return (
-    <Paper
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "auto",
-      }}
-    >
-      <Box
-        sx={{
-          lineHeight: "3em",
-          borderBottom: 1,
-          borderColor: "divider",
-          padding: "0 0.5em",
-        }}
-      >
-        <Stack direction="row" alignItems="center">
-          <IconButton
-            onClick={() => {
-              setSelectedDate(addDays(selectedDate, -1))
-            }}
-          >
-            <ArrowLeft />
-          </IconButton>
-          <Typography variant="h6">
-            {todoList && format(selectedDate, "EEEE MMM d")}
-          </Typography>
-          <IconButton
-            onClick={() => {
-              setSelectedDate(addDays(selectedDate, +1))
-            }}
-          >
-            <ArrowRight />
-          </IconButton>
-        </Stack>
-      </Box>
-      <Box
-        sx={{
-          borderBottom: 1,
-          borderColor: "divider",
-          padding: "0.5em",
-          flexGrow: 1,
-        }}
-      >
-        {creating ? (
-          <AddTaskForm />
-        ) : (
+  const renderContent = () => {
+    if (creating) {
+      return (
+        <AddTaskForm
+          onComplete={task => {
+            dispatch(
+              addTask({
+                task,
+              }),
+            )
+          }}
+          onCancel={() => {
+            dispatch(
+              setCreating({
+                creating: false,
+              }),
+            )
+          }}
+        />
+      )
+    }
+    switch (mode) {
+      case FormMode.TASK_LIBRARY:
+        return <TaskLibrary />
+      case FormMode.DEFAULT:
+      default:
+        return (
           <Stack>
             <FormGroup>
               {taskList.map(task => {
@@ -158,7 +142,72 @@ export const DailyTodoList = (): JSX.Element => {
               Add
             </Button>
           </Stack>
+        )
+    }
+  }
+
+  return (
+    <Paper
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "auto",
+      }}
+    >
+      <Box
+        sx={{
+          lineHeight: "3em",
+          borderBottom: 1,
+          borderColor: "divider",
+          padding: "0 0.5em",
+        }}
+      >
+        {mode === FormMode.TASK_LIBRARY ? (
+          <Typography variant="h6">Task Library</Typography>
+        ) : (
+          <Stack direction="row" alignItems="center">
+            <IconButton
+              onClick={() => {
+                setSelectedDate(addDays(selectedDate, -1))
+              }}
+            >
+              <ArrowLeft />
+            </IconButton>
+            <Typography variant="h6">
+              {todoList && format(selectedDate, "EEEE MMM d")}
+            </Typography>
+            <IconButton
+              onClick={() => {
+                setSelectedDate(addDays(selectedDate, +1))
+              }}
+            >
+              <ArrowRight />
+            </IconButton>
+            <span style={{ flexGrow: 1 }} />
+            <IconButton
+              onClick={() => {
+                dispatch(
+                  setMode({
+                    mode: FormMode.TASK_LIBRARY,
+                  }),
+                )
+              }}
+            >
+              <Settings />
+            </IconButton>
+          </Stack>
         )}
+      </Box>
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: "divider",
+          padding: "0.5em",
+          flexGrow: 1,
+        }}
+      >
+        {renderContent()}
       </Box>
       <Box>
         <Stack

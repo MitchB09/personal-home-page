@@ -378,6 +378,58 @@ Resources:
         Minify: true
         Target: es2020
 
+  ApiGetTaskLibrary:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/tasks/GetTaskLibrary
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+              Resource:
+                - !GetAtt TasksTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /task-library
+            Method: get
+            RestApiId: !Ref ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
+  ApiUpdateTaskLibrary:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/tasks/PostTaskLibrary
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource:
+                - !GetAtt TasksTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /task-library
+            Method: put
+            RestApiId: !Ref ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
   S3Bucket:
     Type: AWS::S3::Bucket
   S3BucketPolicy:

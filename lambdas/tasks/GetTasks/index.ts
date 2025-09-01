@@ -1,6 +1,6 @@
 //
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 import { Context } from "aws-lambda";
 import { jwtDecode, JwtPayload } from "jwt-decode";
@@ -18,8 +18,8 @@ export const handler = async (event: any, context: Context) => {
   const username = decoded["cognito:username"];
 
   var params = {
-    ExpressionAttributeNames : {
-      "#date": "date"
+    ExpressionAttributeNames: {
+      "#date": "date",
     },
     ExpressionAttributeValues: {
       ":userId": username,
