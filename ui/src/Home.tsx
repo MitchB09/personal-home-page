@@ -6,6 +6,7 @@ import { NFLSchedule } from "./features/nfl/NFLSchedule"
 import { Weather } from "./features/weather/Weather"
 import { useGetUserSettingsQuery } from "./features/settings/settingsApiSlice"
 import { DailyTodoList } from "./features/todocalendar/DailyTodoList"
+import { BusSchedule } from "./features/bus/BusSchedule"
 
 export const Home = (): JSX.Element => {
   const { data, isLoading } = useGetUserSettingsQuery("1")
@@ -60,6 +61,17 @@ export const Home = (): JSX.Element => {
               className="tile"
             >
               <NFLSchedule />
+            </Grid>
+          )}
+          {data.homePageData.bus && (
+            <Grid
+              size={{ xs: 12, sm: 12, md: 6 }}
+              sx={{ height: "60vh" }}
+              component="div"
+              role="todos"
+              className="tile"
+            >
+              <BusSchedule />
             </Grid>
           )}
         </Grid>

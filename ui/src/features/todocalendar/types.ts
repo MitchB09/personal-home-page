@@ -32,4 +32,4 @@ export type TodoList = {
   tasks: Task[]
 }
 
-export type Week = {} & Record<string, TodoList>
+export type Week = { weeklyTasks: Task[], dailyTasks:  Record<string, TodoList> }

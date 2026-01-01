@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference types="vitest/config" />
+
 import basicSsl from "@vitejs/plugin-basic-ssl"
 import react from "@vitejs/plugin-react"
 import * as path from "node:path"

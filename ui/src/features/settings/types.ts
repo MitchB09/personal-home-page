@@ -2,7 +2,8 @@ export enum AppType {
   WEATHER = 'weather',
   NEWS = 'news',
   NFL = 'nfl',
-  TODOS = 'todos'
+  TODOS = 'todos',
+  BUS = 'bus'
 }
 
 export type Payload = {

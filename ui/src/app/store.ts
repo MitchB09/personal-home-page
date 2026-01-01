@@ -8,6 +8,7 @@ import { settingsApiSlice } from "../features/settings/settingsApiSlice"
 import { todosSlice } from "../features/todocalendar/todosSlice"
 
 import { authSlice } from "../features/auth/authSlice"
+import { busStopApiSlice } from "../features/bus/busStopApiSlice"
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
@@ -18,6 +19,7 @@ const rootReducer = combineSlices(
   nflApiSlice,
   authSlice,
   todosSlice,
+  busStopApiSlice,
 )
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>
@@ -37,6 +39,7 @@ export const makeStore = (preloadedState?: Partial<RootState>) => {
         weatherApiSlice.middleware,
         rssApiSlice.middleware,
         nflApiSlice.middleware,
+        busStopApiSlice.middleware,
       )
     },
     preloadedState,
