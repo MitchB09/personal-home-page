@@ -1,14 +1,11 @@
-import { act, screen, waitFor } from "@testing-library/react"
-import { http, HttpResponse, delay } from "msw"
+import { screen } from "@testing-library/react"
 import { setupServer } from "msw/node"
+import { expect, test } from "vitest"
 import { renderWithProviders } from "../../../utils/test-utils.js"
 import { BusSchedule } from "../BusSchedule.js"
-import { expect, test } from "vitest"
-
 import { handlers } from "./mocks/handlers.js"
-import fromOfficeResponse from "./mocks/fromOfficeResponse.json"
 
-import nodeFetch, { Request, Response } from "node-fetch";
+import nodeFetch, { Request, Response } from "node-fetch"
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 Object.assign(global, { fetch: nodeFetch, Request, Response });
@@ -25,25 +22,13 @@ afterAll(() => {
   server.close()
 })
 
-describe("BusSchedule", () => {
-  test("Verify Mocks", async () => {
-    const response = await fetch(
-      "https://myride.fredericton.ca/Tmix.Cap.Ti.Process.AnyRide/api/GetCalls",
-      {
-        method: "POST",
-      },
-    )
-    await expect(response.json()).resolves.toEqual(fromOfficeResponse)
-  })
+describe("BusSchedule Componenet", () => {
 
-  test("App includes Weather", async () => {
+  test("Includes Two Schedule Entries", async () => {
     renderWithProviders(<BusSchedule />)
 
-    // The app should be rendered correctly
-    // after some time, the user should be received
-    expect(await screen.findByText(/NOT LOADING/i)).toBeInTheDocument()
-    expect(await screen.findByText(/SUCCESS/i)).toBeInTheDocument()
-    expect(await screen.findByText(/NO DATA/i)).toBeInTheDocument()
+    expect(await screen.findByText(/12N From Office/i)).toBeInTheDocument()
+    expect(await screen.findByText(/13S From Home/i)).toBeInTheDocument()
 
   })
 })

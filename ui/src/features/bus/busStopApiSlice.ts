@@ -1,6 +1,6 @@
 // Need to use the React-specific entry point to import `createApi`
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import type { Payload, Request } from "./types"
+import type { Payload, Request, Run } from "./types"
 
 // Define a service using a base URL and expected endpoints
 export const busStopApiSlice = createApi({
@@ -13,9 +13,8 @@ export const busStopApiSlice = createApi({
   tagTypes: ["BusRoutes"],
 
   endpoints: build => ({
-    getNextBus: build.query<Payload, Request>({
+    getNextBus: build.query<Run[], Request>({
       query: (request: Request) => {
-        console.dir(request)
         return {
           url: `/GetCalls`,
           method: "POST",
@@ -30,9 +29,12 @@ export const busStopApiSlice = createApi({
           },
         }
       },
-      transformResponse: (response: Payload) => {
-        console.dir(response);
-        return response;
+      transformResponse: (response: Payload, _, request: Request): Run[] => {
+        return response.calls.length
+          ? response.calls.filter(
+              call => call.id.includes(`l:${request.lineId.toString()}/`),
+            ).flatMap(route => route.calls)
+          : []
       },
       providesTags: ["BusRoutes"],
     }),
