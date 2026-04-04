@@ -4,4 +4,11 @@ export type Payload = {
   lastUpdated: string
 }
 
-export type AppState = Record<string, boolean>
+export enum Apps {
+  WEATHER = 'weather',
+  NEWS = 'news',
+  NFL = 'nfl',
+  RECIPES = 'recipes',
+}
+
+export type AppState = Record<Apps, boolean>

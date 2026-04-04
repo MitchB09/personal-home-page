@@ -20,7 +20,7 @@ type Subscription = {
 export const handler = async (_: any, context: Context) => {
   const dynamodb = new DynamoDBClient({});
   const ddb = DynamoDBDocumentClient.from(dynamodb);
-  const rssTable = process.env.RSS_TABLE;
+  const entityTable = process.env.ENTITY_TABLE;
 
   var params = {
     ExpressionAttributeValues: {
@@ -28,7 +28,7 @@ export const handler = async (_: any, context: Context) => {
     },
     KeyConditionExpression: "entityType = :entityType",
     ProjectionExpression: "id, rssUrl, title, lastUpdated",
-    TableName: rssTable,
+    TableName: entityTable,
   };
 
   const { Items } = await ddb.send(new QueryCommand(params));
@@ -44,7 +44,7 @@ export const handler = async (_: any, context: Context) => {
       const data = parser.parse(response.data);
 
       var params = {
-        TableName: rssTable,
+        TableName: entityTable,
         Item: {
           entityType: entityType,
           id: subscription.id,

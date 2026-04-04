@@ -8,7 +8,7 @@ const url = import.meta.env.VITE_PERSONAL_DOMAIN as string
 // Define a service using a base URL and expected endpoints
 export const settingsApiSlice = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: `${url}/settings/`,
+    baseUrl: `${url}/settings`,
     prepareHeaders: (headers, { getState }) => {
       // Add common headers like Authorization
       const rootState = getState() as RootState
@@ -27,12 +27,12 @@ export const settingsApiSlice = createApi({
 
   endpoints: build => ({
     getUserSettings: build.query<Payload, string>({
-      query: id => `/${id}`,
+      query: () => ``,
       providesTags: ["Settings"],
     }),
     updateUserSettings: build.mutation<Payload, Payload>({
       query: body => ({
-        url: `/${body.id}`,
+        url: '',
         method: "POST",
         body: body,
       }),

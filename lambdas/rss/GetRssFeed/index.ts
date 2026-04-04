@@ -15,7 +15,7 @@ const entityType = "RSS";
 export const handler = async (event: any, context: Context) => {
   const dynamodb = new DynamoDBClient({});
   const ddb = DynamoDBDocumentClient.from(dynamodb);
-  const rssTable = process.env.RSS_TABLE as string;
+  const entityTable = process.env.ENTITY_TABLE as string;
 
   if (!event.pathParameters || !event.pathParameters.id) {
     return {
@@ -41,7 +41,7 @@ export const handler = async (event: any, context: Context) => {
   }
 
   const params = {
-    TableName: rssTable,
+    TableName: entityTable,
     Key: { entityType: entityType, id: id },
     ProjectionExpression: "id, rssUrl, rssData, lastUpdated",
   };
@@ -66,7 +66,7 @@ export const handler = async (event: any, context: Context) => {
         };
 
         var putParams = {
-          TableName: rssTable,
+          TableName: entityTable,
           Item: {
             entityType: entityType,
             ...refreshedFeed,

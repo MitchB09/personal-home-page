@@ -1,0 +1,60 @@
+import { type JSX } from "react"
+
+import { Launch as LaunchIcon } from "@mui/icons-material"
+import {
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Paper,
+} from "@mui/material"
+import { useAppDispatch } from "../../app/hooks"
+import { RecipeDialog } from "./components/RecipeDialog"
+import { useGetRecipesQuery } from "./recipeApiSlice"
+import { setRecipe } from "./recipeSlice"
+
+export const Recipes = (): JSX.Element => {
+  const dispatch = useAppDispatch()
+  const { data /* isError, isLoading isSuccess */ } = useGetRecipesQuery("")
+
+  if (!data) {
+    return <>Loading...</>
+  }
+
+  return (
+    <Paper sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <List>
+        {data.map(recipe => (
+          <ListItem
+            key={recipe.id}
+            secondaryAction={
+              <IconButton
+                edge="end"
+                aria-label="launch"
+                onClick={() => {
+                  window.open(recipe.recipeUrl, "_blank", "noopener,noreferrer")
+                }}
+              >
+                <LaunchIcon />
+              </IconButton>
+            }
+          >
+            <ListItemButton>
+              <ListItemText>{recipe.title}</ListItemText>
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Button
+        onClick={() => {
+          dispatch(setRecipe({}))
+        }}
+      >
+        Add
+      </Button>
+      <RecipeDialog />
+    </Paper>
+  )
+}

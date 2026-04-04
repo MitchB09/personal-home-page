@@ -5,14 +5,14 @@ import { mockClient } from "aws-sdk-client-mock";
 import { handler } from "./index";
 import { mockContext, mockEvent, mockYCombinatorResult } from "../../mocks/mocks";
 
-const testTableName = "TEST_RSS_TABLE_NAME";
+const testTableName = "TEST_ENTITY_TABLE_NAME";
 
 describe("Index.js", () => {
   // Create a mock for S3 at the beginning of your describe block.
   const ddbMock = mockClient(DynamoDBDocumentClient);
 
   // Set table name env var
-  process.env.RSS_TABLE = testTableName;
+  process.env.ENTITY_TABLE = testTableName;
 
   // Make sure to reset your mocks before each test to avoid issues.
   beforeEach(() => {

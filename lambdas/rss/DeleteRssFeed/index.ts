@@ -12,7 +12,7 @@ const entityType = "RSS";
 export const handler = async (event: any, context: Context) => {
   const dynamodb = new DynamoDBClient({});
   const ddb = DynamoDBDocumentClient.from(dynamodb);
-  const rssTable = process.env.RSS_TABLE;
+  const entityTable = process.env.ENTITY_TABLE;
 
   const id = event.pathParameters.id;
 
@@ -21,7 +21,7 @@ export const handler = async (event: any, context: Context) => {
       entityType: entityType,
       id: id,
     },
-    TableName: rssTable,
+    TableName: entityTable,
   };
 
   try {

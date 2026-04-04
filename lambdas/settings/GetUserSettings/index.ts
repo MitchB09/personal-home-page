@@ -6,19 +6,16 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 
 import { Context } from "aws-lambda";
-
+import { jwtDecode } from "jwt-decode"
 const entityType: string = "SETTINGS";
 
 export const handler = async (event: any, context: Context) => {
-  const dynamodb = new DynamoDBClient({});
-  const ddb = DynamoDBDocumentClient.from(dynamodb);
-  const rssTable = process.env.RSS_TABLE as string;
-
-  if (!event.pathParameters || !event.pathParameters.id) {
+  const userId = jwtDecode(event.headers.Authorization).sub;
+  if (!userId) {
     return {
       statusCode: 400,
       body: JSON.stringify({
-        Error: "IDs not provided",
+        Error: "No userId Found",
       }),
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -27,12 +24,14 @@ export const handler = async (event: any, context: Context) => {
     };
   }
 
-  const id = decodeURI(event.pathParameters.id);
+  const dynamodb = new DynamoDBClient({});
+  const ddb = DynamoDBDocumentClient.from(dynamodb);
+  const entityTable = process.env.ENTITY_TABLE as string;
 
   const params = {
-    TableName: rssTable,
-    Key: { entityType: entityType, id: id },
-    ProjectionExpression: "id, homePageData, lastUpdated",
+    TableName: entityTable,
+    Key: { entityType: entityType, id: userId },
+    ProjectionExpression: "homePageData, lastUpdated",
   };
 
   try {
@@ -53,7 +52,7 @@ export const handler = async (event: any, context: Context) => {
           "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-          Error: `No settings found for id: ${id}`,
+          Error: `No settings found for user`,
         }),
         isBase64Encoded: false,
       };

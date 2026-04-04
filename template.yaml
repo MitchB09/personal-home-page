@@ -21,7 +21,8 @@ Globals:
     Runtime: nodejs22.x
     Environment:
       Variables:
-        RSS_TABLE: !Ref RssTable
+        ENTITY_TABLE: !Ref EntityTable
+
 
 Resources:
 
@@ -84,7 +85,7 @@ Resources:
       Domain: !Sub '${AWS::StackName}-${Stage}'
       UserPoolId: !Ref UserPool
 
-  RssTable:
+  EntityTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
@@ -112,7 +113,7 @@ Resources:
                 - dynamodb:Query
                 - dynamodb:PutItem
               Resource:
-                - !GetAtt RssTable.Arn
+                - !GetAtt EntityTable.Arn
       Events:
         ComplexScheduleEvent:
           Type: ScheduleV2
@@ -162,7 +163,7 @@ Resources:
               Action:
                 - dynamodb:Query
               Resource:
-                - !GetAtt RssTable.Arn
+                - !GetAtt EntityTable.Arn
       Events:
         ApiEvent:
           Type: Api
@@ -189,7 +190,7 @@ Resources:
                 - dynamodb:GetItem
                 - dynamodb:PutItem
               Resource:
-                - !GetAtt RssTable.Arn
+                - !GetAtt EntityTable.Arn
       Events:
         ApiEvent:
           Type: Api
@@ -216,7 +217,7 @@ Resources:
                 - dynamodb:Query
                 - dynamodb:PutItem
               Resource:
-                - !GetAtt RssTable.Arn
+                - !GetAtt EntityTable.Arn
       Events:
         ApiEvent:
           Type: Api
@@ -242,7 +243,7 @@ Resources:
               Action:
                 - dynamodb:DeleteItem
               Resource:
-                - !GetAtt RssTable.Arn
+                - !GetAtt EntityTable.Arn
       Events:
         ApiEvent:
           Type: Api
@@ -268,12 +269,12 @@ Resources:
               Action:
                 - dynamodb:GetItem
               Resource:
-                - !GetAtt RssTable.Arn
+                - !GetAtt EntityTable.Arn
       Events:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /settings/{id}
+            Path: /settings
             Method: get
             RestApiId: !Ref ApiGatewayApi
     Metadata:
@@ -294,13 +295,119 @@ Resources:
               Action:
                 - dynamodb:PutItem
               Resource:
-                - !GetAtt RssTable.Arn
+                - !GetAtt EntityTable.Arn
       Events:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /settings/{id}
+            Path: /settings
             Method: post
+            RestApiId: !Ref ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
+  ApiListRecipes:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/recipes/ListRecipes
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+              Resource:
+                - !GetAtt EntityTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /recipes
+            Method: get
+            RestApiId: !Ref ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
+  ApiGetRecipe:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/recipes/GetRecipe
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+              Resource:
+                - !GetAtt EntityTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /recipes/{id}
+            Method: get
+            RestApiId: !Ref ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true # Optional: minify the output JavaScript
+        Target: es2020 # Optional: specify target JavaScript version
+
+  ApiPostRecipe:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/recipes/PostRecipe
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:PutItem
+              Resource:
+                - !GetAtt EntityTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /recipes
+            Method: post
+            RestApiId: !Ref ApiGatewayApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+
+  ApiDeleteRecipe:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/recipes/DeleteRecipe
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:DeleteItem
+              Resource:
+                - !GetAtt EntityTable.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /recipes/{id}
+            Method: delete
             RestApiId: !Ref ApiGatewayApi
     Metadata:
       BuildMethod: esbuild
@@ -368,9 +475,11 @@ Outputs:
   S3Bucket:
     Description: S3 Bucket Name
     Value: !Ref S3Bucket
-  RssTable:
-    Description: RssTable Name
-    Value: !Ref RssTable
+  ApiGatewayApi:
+    Value: !Ref ApiGatewayApi
+  EntityTable:
+    Description: EntityTable Name
+    Value: !Ref EntityTable
   CloudFrontDisribution:
     Description: CloudFront Distibution Id
     Value: !Ref CloudFrontDistribution
