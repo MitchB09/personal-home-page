@@ -16,7 +16,7 @@ export const handler = async (event: any, context: Context) => {
       ":entityType": entityType,
     },
     KeyConditionExpression: "entityType = :entityType",
-    ProjectionExpression: "id, recipeUrl, title, lastUpdated",
+    ProjectionExpression: "id, recipeUrl, title, notes, tags, lastUpdated",
     TableName: entityTable,
   };
 

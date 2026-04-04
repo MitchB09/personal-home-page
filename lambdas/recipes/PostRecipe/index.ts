@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 
 import { Context } from "aws-lambda";
+import { jwtDecode } from "jwt-decode";
 import { v4 as uuidv4 } from "uuid";
 
 const entityType = 'RECIPE';
@@ -16,20 +17,24 @@ export type AddRecieForm = {
 };
 
 export const handler = async (event: any, context: Context) => {
+  const userId = jwtDecode(event.headers.Authorization).sub;
+
   const dynamodb = new DynamoDBClient({});
   const ddb = DynamoDBDocumentClient.from(dynamodb);
   const entityTable = process.env.ENTITY_TABLE;
-
-  const payload = JSON.parse(event.body) as AddRecieForm;
+  const payload = JSON.parse(event.body);
 
   try {
     const item = {
       entityType: entityType,
-      id: uuidv4(),
-      title: payload.title,
-      recipeUrl: payload.recipeUrl,
+      userId: userId,
       lastUpdated: Date.now(),
+      ...payload,
     };
+
+    if (!item.id) {
+      item.id = uuidv4();
+    }
 
     var params = {
       TableName: entityTable,

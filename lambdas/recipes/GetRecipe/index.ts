@@ -29,18 +29,10 @@ export const handler = async (event: any, context: Context) => {
 
   const id = decodeURI(event.pathParameters.id);
 
-  let triggerRefresh = false;
-  if (
-    event.queryStringParameters &&
-    ['true', '1'].includes(event.queryStringParameters.refresh)
-  ) {
-    triggerRefresh = true;
-  }
-
   const params = {
     TableName: entityTable,
     Key: { entityType: entityType, id: id },
-    ProjectionExpression: "id, recipeUrl, title, lastUpdated",
+    ProjectionExpression: "id, recipeUrl, title, notes, tags, lastUpdated",
   };
 
   try {

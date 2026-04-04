@@ -3,6 +3,7 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
 import { weatherApiSlice } from "../features/weather/weatherApiSlice"
 import { recipeApiSlice } from "../features/recipes/recipeApiSlice"
+import { recipeSlice } from "../features/recipes/recipeSlice"
 import { rssApiSlice } from "../features/news/rssApiSlice"
 import { nflApiSlice } from "../features/nfl/nflApiSlice"
 import { settingsApiSlice } from "../features/settings/settingsApiSlice"
@@ -14,6 +15,7 @@ const rootReducer = combineSlices(
   settingsApiSlice,
   weatherApiSlice,
   recipeApiSlice,
+  recipeSlice,
   rssApiSlice,
   nflApiSlice,
   authSlice,
