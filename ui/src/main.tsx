@@ -1,4 +1,5 @@
 import { StrictMode } from "react"
+import { CookiesProvider } from "react-cookie"
 import { createRoot } from "react-dom/client"
 import { AuthProvider } from "react-oidc-context"
 import { Provider } from "react-redux"
@@ -22,11 +23,13 @@ if (container) {
 
   root.render(
     <StrictMode>
-      <AuthProvider {...cognitoAuthConfig}>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </AuthProvider>
+      <CookiesProvider defaultSetOptions={{ path: "/" }}>
+        <AuthProvider {...cognitoAuthConfig}>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </AuthProvider>
+      </CookiesProvider>
     </StrictMode>,
   )
 } else {

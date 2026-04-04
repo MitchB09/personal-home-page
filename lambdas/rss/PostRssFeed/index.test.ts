@@ -19,7 +19,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 jest.mock("uuid");
 const mockedUuid = uuidv4 as jest.Mocked<typeof uuidv4>;
 
-const testTableName = "TEST_RSS_TABLE_NAME";
+const testTableName = "TEST_ENTITY_TABLE_NAME";
 const generatedUuid = "00000000-000a-0000-0000-00000000000a";
 
 describe("Index.js", () => {
@@ -42,7 +42,7 @@ describe("Index.js", () => {
   });
 
   // Set table name env var
-  process.env.RSS_TABLE = testTableName;
+  process.env.ENTITY_TABLE = testTableName;
 
   // Make sure to reset your mocks before each test to avoid issues.
   beforeEach(() => {

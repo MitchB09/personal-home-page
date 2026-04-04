@@ -9,7 +9,7 @@ const entityType = 'RSS';
 export const handler = async (event: any, context: Context) => {
   const dynamodb = new DynamoDBClient({});
   const ddb = DynamoDBDocumentClient.from(dynamodb);
-  const rssTable = process.env.RSS_TABLE;
+  const entityTable = process.env.ENTITY_TABLE;
 
   var params = {
     ExpressionAttributeValues: {
@@ -17,7 +17,7 @@ export const handler = async (event: any, context: Context) => {
     },
     KeyConditionExpression: "entityType = :entityType",
     ProjectionExpression: "id, rssUrl, title, lastUpdated",
-    TableName: rssTable,
+    TableName: entityTable,
   };
 
   try {

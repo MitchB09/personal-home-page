@@ -19,6 +19,7 @@ export const darkTheme = createTheme({
 
 export const App = () => {
   const auth = useAuth()
+
   const dispatch = useAppDispatch()
   const user = useAppSelector(selectUser)
 

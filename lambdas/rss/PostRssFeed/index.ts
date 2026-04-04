@@ -22,7 +22,7 @@ export type AddFeedForm = {
 export const handler = async (event: any, context: Context) => {
   const dynamodb = new DynamoDBClient({});
   const ddb = DynamoDBDocumentClient.from(dynamodb);
-  const rssTable = process.env.RSS_TABLE;
+  const entityTable = process.env.ENTITY_TABLE;
 
   const payload = JSON.parse(event.body) as AddFeedForm;
 
@@ -41,7 +41,7 @@ export const handler = async (event: any, context: Context) => {
       };
 
       var params = {
-        TableName: rssTable,
+        TableName: entityTable,
         Item: item,
       };
 
