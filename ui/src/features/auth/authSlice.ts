@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from '../../app/store'
 import type { User } from 'oidc-client-ts'
+import type { RootState } from '../../app/store'
 
 type AuthState = {
   user?: User

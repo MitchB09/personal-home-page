@@ -33,7 +33,7 @@ export const recipeApiSlice = createApi({
       },
       providesTags: (_result, _error, id) => [{ type: "RECIPIES", id: id }],
     }),
-    createRecipe: build.mutation<Recipe, Recipe>({
+    postRecipe: build.mutation<Recipe, Recipe>({
       query: body => ({
         url: "/",
         method: "POST",
@@ -53,6 +53,6 @@ export const recipeApiSlice = createApi({
 export const {
   useGetRecipesQuery,
   useGetRecipeQuery,
-  useCreateRecipeMutation,
+  usePostRecipeMutation,
   useDeleteRecipeMutation,
 } = recipeApiSlice

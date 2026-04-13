@@ -8,12 +8,12 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Paper,
+  Paper
 } from "@mui/material"
 import { useAppDispatch } from "../../app/hooks"
 import { RecipeDialog } from "./components/RecipeDialog"
 import { useGetRecipesQuery } from "./recipeApiSlice"
-import { setRecipe } from "./recipeSlice"
+import { createNewRecipe, viewRecipe } from "./recipeSlice"
 
 export const Recipes = (): JSX.Element => {
   const dispatch = useAppDispatch()
@@ -41,7 +41,7 @@ export const Recipes = (): JSX.Element => {
               </IconButton>
             }
           >
-            <ListItemButton>
+            <ListItemButton onClick={() => dispatch(viewRecipe(recipe))}>
               <ListItemText>{recipe.title}</ListItemText>
             </ListItemButton>
           </ListItem>
@@ -49,7 +49,7 @@ export const Recipes = (): JSX.Element => {
       </List>
       <Button
         onClick={() => {
-          dispatch(setRecipe({}))
+          dispatch(createNewRecipe())
         }}
       >
         Add
