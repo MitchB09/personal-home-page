@@ -15,6 +15,7 @@ import {
   IconButton,
   Stack,
   TextField,
+  createFilterOptions,
 } from "@mui/material"
 import { usePostRecipeMutation } from "../recipeApiSlice"
 import {
@@ -23,6 +24,7 @@ import {
   updateRecipe,
   selectMode,
   Mode,
+  selectTags,
 } from "../recipeSlice"
 import { useAppDispatch, useAppSelector } from "../../../app/hooks"
 import Markdown from "react-markdown"
@@ -32,9 +34,11 @@ export const RecipeDialog = (): JSX.Element => {
   const dispatch = useAppDispatch()
   const recipe = useAppSelector(selectRecipe)
   const mode = useAppSelector(selectMode)
+  const tags = useAppSelector(selectTags)
+
   const [postRecipe] = usePostRecipeMutation()
 
-  const tags = ["Baking", "BBQ", "Soups"]
+  const filter = createFilterOptions<string>()
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(
@@ -112,6 +116,21 @@ export const RecipeDialog = (): JSX.Element => {
                   selectOnFocus
                   clearOnBlur
                   multiple={true}
+                  handleHomeEndKeys
+                  filterOptions={(options, params) => {
+                    const filtered = filter(options, params)
+
+                    const { inputValue } = params
+                    // Suggest the creation of a new value
+                    const isExisting = tags.some(
+                      tag => inputValue === tag,
+                    )
+                    if (inputValue !== "" && !isExisting) {
+                      filtered.push(inputValue)
+                    }
+
+                    return filtered
+                  }}
                   renderInput={params => (
                     <TextField {...params} variant="standard" label="Tags" />
                   )}
@@ -133,7 +152,7 @@ export const RecipeDialog = (): JSX.Element => {
               aria-label="edit"
               onClick={() => {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                dispatch(updateRecipe(recipe!));
+                dispatch(updateRecipe(recipe!))
               }}
             >
               <EditIcon />
@@ -149,9 +168,13 @@ export const RecipeDialog = (): JSX.Element => {
           </DialogTitle>
           <DialogContent>
             <Stack gap={1} margin={1}>
-              {recipe?.notes && (<Box>
-                <Markdown remarkPlugins={[remarkGfm]}>{recipe.notes}</Markdown>
-              </Box>)}
+              {recipe?.notes && (
+                <Box>
+                  <Markdown remarkPlugins={[remarkGfm]}>
+                    {recipe.notes}
+                  </Markdown>
+                </Box>
+              )}
               <Box>
                 {recipe?.tags?.map(tag => {
                   return <Chip label={tag} />
