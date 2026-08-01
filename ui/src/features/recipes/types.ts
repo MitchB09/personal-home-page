@@ -4,7 +4,7 @@ export type Recipe = {
   title: string,
   recipeUrl: string,
   notes?: string;
-  tags: string[];
+  tags?: string[];
   lastUpdated?: number,
 }
 

@@ -35,7 +35,7 @@ export const Recipes = (): JSX.Element => {
     } else {
       return data.filter((recipie: Recipe) => {
         return filterTags.some(selected => {
-          return recipie.tags && recipie.tags.includes(selected)
+          return recipie.tags?.includes(selected)
         })
       })
     }
@@ -124,6 +124,7 @@ export const Recipes = (): JSX.Element => {
           >
             <ListItemButton onClick={() => dispatch(viewRecipe(recipe))}>
               <ListItemText>{recipe.title}</ListItemText>
+              {recipe.tags && <i>{recipe.tags.join(", ")}</i>}
             </ListItemButton>
           </ListItem>
         ))}
