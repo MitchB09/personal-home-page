@@ -32,7 +32,6 @@ export const recipeSlice = createSlice({
         console.dir(payload);
         const found = new Set<string>(defaultTags);
         payload.forEach(recipe => {
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           recipe.tags?.forEach(element => {
             found.add(element)
           });
