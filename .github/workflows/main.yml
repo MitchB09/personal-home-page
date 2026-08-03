@@ -8,6 +8,8 @@ on:
   # Triggers the workflow on push for the master branch
   push:
     branches: [ main ]
+    paths:
+      - 'ui/**' # Triggers only if files in the 'ui' folder change
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,7 +26,9 @@ jobs:
     environment: main
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2 # Fetches the current commit and its immediate parent
       
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v1

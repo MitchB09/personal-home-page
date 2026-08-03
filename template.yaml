@@ -39,7 +39,7 @@ Resources:
               Action:
                 - 'sts:AssumeRoleWithWebIdentity'
               Condition:
-                StringEquals:
+                StringLike:
                     token.actions.githubusercontent.com:sub: "repo:MitchB09/personal-home-page:*"
                     token.actions.githubusercontent.com:aud: "sts.amazonaws.com"
       ManagedPolicyArns:
@@ -491,6 +491,9 @@ Resources:
           MinimumProtocolVersion: TLSv1.2_2019
 
 Outputs:
+  GitHubActionRoleArm:
+    Description: GitHub Action Role
+    Value: !GetAtt GithubPipeline.Arn
   S3Bucket:
     Description: S3 Bucket Name
     Value: !Ref S3Bucket
@@ -499,7 +502,7 @@ Outputs:
   EntityTable:
     Description: EntityTable Name
     Value: !Ref EntityTable
-  CloudFrontDisribution:
+  CloudFrontDistribution:
     Description: CloudFront Distibution Id
     Value: !Ref CloudFrontDistribution
   CloudFrontDomain:
