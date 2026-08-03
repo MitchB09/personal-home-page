@@ -26,6 +26,25 @@ Globals:
 
 Resources:
 
+  GithubPipeline:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated:
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+              Action:
+                - 'sts:AssumeRoleWithWebIdentity'
+              Condition:
+                StringEquals:
+                    token.actions.githubusercontent.com:sub: "repo:MitchB09/personal-home-page:*"
+                    token.actions.githubusercontent.com:aud: "sts.amazonaws.com"
+      ManagedPolicyArns:
+        - !Sub "arn:aws:iam::${AWS::AccountId}:policy/GithubActions_Crosswords"
+
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
