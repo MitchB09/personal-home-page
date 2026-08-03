@@ -14,7 +14,16 @@ import { Home } from "./Home"
 export const darkTheme = createTheme({
   palette: {
     mode: "dark",
-  },
+    // primary: {
+    //   main: '#a40000',
+    //   // light: will be calculated from palette.primary.main,
+    //   // dark: will be calculated from palette.primary.main,
+    //   // contrastText: will be calculated to contrast with palette.primary.main
+    // },
+    // secondary: {
+    //   main: '#00a4a4',
+    // }
+  }
 })
 
 export const App = () => {

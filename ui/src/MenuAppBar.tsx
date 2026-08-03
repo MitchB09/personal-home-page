@@ -1,4 +1,5 @@
 import React, { type JSX } from "react"
+import { useAuth } from "react-oidc-context"
 
 import {
   Logout as LogoutIcon,
@@ -15,20 +16,13 @@ import { useAppSelector } from "./app/hooks"
 import { selectUser } from "./features/auth/authSlice"
 import { UserDialog } from "./features/auth/UserDialog"
 
-
-const logout = () => {
-  const clientId = import.meta.env.VITE_USERPOOL_CLIENT_ID as string
-  const logoutUri = import.meta.env.VITE_REDIRECT_URL as string
-  const cognitoDomain =
-    "https://home-page-dev-dev.auth.us-east-1.amazoncognito.com"
-  window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`
-}
-
 export const MenuAppBar = (): JSX.Element => {
   const [open, setOpen] = React.useState(false)
+
   const [userDialogOpen, setUserDialogOpen] = React.useState(false)
 
-  const user = useAppSelector(selectUser)
+  const user = useAppSelector(selectUser);
+  const auth = useAuth();
 
   return (
     <AppBar position="static">
@@ -78,7 +72,7 @@ export const MenuAppBar = (): JSX.Element => {
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={() => {
-                  logout()
+                  void auth.signoutRedirect()
                 }}
                 color="inherit"
               >
