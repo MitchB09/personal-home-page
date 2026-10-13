@@ -45,27 +45,11 @@ Resources:
       ManagedPolicyArns:
         - !Sub "arn:aws:iam::${AWS::AccountId}:policy/GithubActions_Crosswords"
 
-  UserPool:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: true
-      UserPoolName: !Sub '${AWS::StackName}-${Stage}-user-pool'
-      UsernameConfiguration:
-        CaseSensitive: false
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          RequireLowercase: True
-          RequireNumbers: False
-          RequireSymbols: True
-          RequireUppercase: True
-
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       ClientName: !Sub '${AWS::StackName}-${Stage}-user-pool-client'
-      UserPoolId: !Ref UserPool
+      UserPoolId: !ImportValue "bilensky-auth-UserPoolId"
       GenerateSecret: false
       ExplicitAuthFlows:
         - ALLOW_USER_PASSWORD_AUTH
@@ -97,12 +81,6 @@ Resources:
       AllowedOAuthScopes:
         - email
         - openid
-
-  UserPoolDomain:
-    Type: AWS::Cognito::UserPoolDomain
-    Properties: 
-      Domain: !Sub '${AWS::StackName}-${Stage}'
-      UserPoolId: !Ref UserPool
 
   EntityTable:
     Type: AWS::DynamoDB::Table
@@ -168,7 +146,7 @@ Resources:
         AddDefaultAuthorizerToCorsPreflight: false
         Authorizers:
           CognitoAuthorizer:
-            UserPoolArn: !GetAtt UserPool.Arn
+            UserPoolArn: !ImportValue "bilensky-auth-UserPoolArn"
 
   ApiListRssFeeds:
     Type: AWS::Serverless::Function
@@ -513,7 +491,7 @@ Outputs:
     Value: !Sub https://home-api-${Stage}.bilensky.ca/
   CognitoUserPool: 
     Description: Cognito User Pool Id
-    Value: !Ref UserPool
+    Value: !ImportValue "bilensky-auth-UserPoolId"
   CognitoClient: 
     Description: Cognito Client Id
     Value: !Ref UserPoolClient
