@@ -13,6 +13,9 @@ const cognitoAuthConfig = {
   redirect_uri: import.meta.env.VITE_REDIRECT_URL as string,
   response_type: "code",
   scope: "email openid",
+  onSigninCallback: (): void => {
+    window.history.replaceState({}, document.title, window.location.pathname)
+  },
 }
 
 const container = document.getElementById("root")
